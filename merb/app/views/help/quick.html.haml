@@ -1,0 +1,149 @@
+:javascript
+  current = 'help'
+#quick
+
+  = partial 'menu', :selected => 'quick'
+
+
+  #video
+    =partial 'partials/video'
+
+  :redcloth
+   
+    <br>
+    If you prefer, you can follow the Quick Start Guide 
+    <a href="#TB_inline?height=410&width=640&inlineId=video" title="Quick Start Guide! video" class="thickbox">Video</a>
+    <br>
+    
+    h1. Launching a Job
+
+    This section will walk you through launching a typical MARQ job.
+
+    h2. 1. Select the organism the genes belong to
+
+    !/images/guide/organism.png!
+
+    The default is to make a cross platform query. You may query an specific
+    platform only, but you must specify the genes in the original platform id
+    format.
+
+    h2. 2. Paste your genes of interest 
+    
+    ... in the up and down text areas. You may use one or both.
+
+    !/images/guide/genes.png!
+
+
+    h2. 3. Select a name for your job and click Submit
+    
+    The name will be used to access the job at any latter time. If you do not
+    select one, a random one will be used. 
+
+    !/images/guide/name.png!
+
+    h2. 4. Wait for the computations to finish. 
+    
+    Please be patient, it might take a few minutes. The server needs to compute
+    the results and generate the html report; and then the browser needs to
+    render the html. Due to the amount of data displayed, each of these steps
+    may take a while.
+
+    h1. Inspecting the Results
+
+    The results page shows a table with the results sorted by their relation to the
+    query. Be sure to check the top and bottom of the list; some signatures may
+    have the conditions swapped in the comparison. Signature with the keyword
+    [ratio] appended to the name did not have enough replicates to compute
+    t-values and have their signatures derived from the log-ratios. 
+    
+    The scores goes from -1 to 1 in the case of a single list query, and from
+    -2 to 2 for a two list query. Since the scores depend strongly on the size
+    of the query lists, the permutation based p-values, also shown, are a more
+    reliable measure of relevance. These p-values have been corrected for FDR.
+
+    *Click the <span class='toggle_example'>[+]</span> link to 
+    display additional information* in for any of the signatures, including the dataset
+    description and images showing how the genes in the up and down lists.
+
+    Once the information is expanded, all the words in the description and title
+    (except for stopwords) will be click-able. *Click words to highlight signatures sharing that word*
+    and mark them in the adjoining hit-area, left of the table.
+
+    You may *double click on any place on the hit-area* to scroll the table
+    down to the corresponding signature.
+
+    !/images/guide/table.png!
+
+
+    h2. Examine annotations
+
+    Words are just one type of annotations for signatures. The annotation menu
+    shows additional annotations like  GO terms.
+    Selecting any of them will display a table with the annotations that are
+    significantly over-represented at both extremes of the results list. Only
+    word annotations are loaded by default, all the rest will be loaded when
+    selected the first time, which might take a little while. This table can
+    also be clicked to mark relevant signatures in the hit-area. The p-values
+    are corrected for multiple testing.
+
+    !/images/guide/annotations.png!
+
+    h2. View gene hits for a signature
+
+    Click on the hit bar views for the signatures (the green horizontal bars) to see detailed
+    information about the positions of the query genes in the signature. 
+
+    !/images/guide/hits.png!
+
+    Use the mouse to select interesting clusters of genes using click and drag
+    over the hit-area. Download those genes using the button 'Get Selected
+    Genes' to be used in another application like
+    "SENT":http://sent.dacya.ucm.es or
+    "GeneCodis":http://genecodis.dacya.ucm.es . Also, you may download the
+    log-ratios and t-values (if available for that signature) associated with
+    the query genes. 
+
+    Each genes has a link to its description entry an external reference site,
+    and to its profile in the GEO dataset (not available for GEO series or
+    datasets from other sources).
+
+    h2. Compare signatures (Rank Product)
+
+    You may select two or more signatures to perform meta-analysis. Use the
+    check boxes in the 'Compare' column to select the signatures. The first
+    check box, after <span><notextile>&uarr</notextile></span> select the
+    signature as-is. The other one, after the
+    <span><notextile>&darr</notextile></span> inverts the order of the genes,
+    and can be used to compare against signatures that may have the conditions
+    swapped in the comparison (thus appearing in the bottom of the list when
+    they should be on the top). Then click the 'Compare signatures' button.
+    
+    !/images/guide/compare.png!
+
+    The result of the meta-analysis compromises an up-regulated and a
+    down-regulated list of genes, which where found significantly de-regulated
+    in all the signatures using the Rank Product methodology. It also shows
+    separated tables for the genes in the up and down query lists. 
+    
+    !/images/guide/compare_page.png!
+
+    The complete details of the analysis can be downloaded in tab separated
+    format or in Excels xls. These files include, among other things, the log Rank
+    Product scores, the p-values, and whether the genes where included in the
+    original query lists. P-values are not FDR corrected, instead, we include
+    the PFP (equivalent to FDR) in the downloadable results.
+
+    h2. Download the signature information
+
+    You may download the log-ratios and t-values for all the genes in a signature from
+    the main results page.
+
+    !/images/guide/download.png!
+
+    Note that genes in these files are referenced by the applications internal
+    identifier format, which is usually the organism specific database id
+    format, as opposed to when they are downloaded from the hits page, where,
+    since only the genes in the query are included, they can be translated to
+    the original format used by the user.
+    
+

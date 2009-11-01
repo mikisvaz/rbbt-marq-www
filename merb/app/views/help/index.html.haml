@@ -1,0 +1,110 @@
+:javascript
+  current = 'help'
+#help
+
+  = partial 'menu', :selected => 'main'
+  
+  #video
+    =partial 'partials/video'
+
+
+  :redcloth
+    h1. Introduction
+
+    MARQ is an online microarray retrieval tool based on rank statistics.
+    Datasets in MARQ, most of them retrieved from GEO, are processed into
+    signatures, which are lists of genes ranked by their level of differential
+    expression.  Each dataset defines one of more of these signatures based on
+    the possible comparisons of its constituent samples. 
+    
+    The user may query MARQ using two lists of genes, one represents
+    over-expressed genes and the other under-expressed genes. The gene lists
+    are compared against the signatures in MARQ to determine which of those
+    signatures  have similar or opposite patterns of expression. The result of
+    the analysis is the list of signatures sorted by their relevance to the
+    query; signatures in the top show the strongest direct relationship
+    with the query, and signatures in the bottom show the strongest inverse
+    relationship. 
+    
+    MARQ offers some additional features to help the user explore the results,
+    enabling the user to examine the actual ranks of the query genes in
+    a signature or the distribution of terms amongst the list of signatures,
+    or even to perform meta-analysis between interesting signatures.
+
+    Check the "methods":/help/methods for more information about 
+    implementation details. The "Quick Start Guide":/help/quick and the
+    <a href="#TB_inline?height=410&width=640&inlineId=video" title="Quick Start Guide! video" class="thickbox">Video tutorial</a>
+    have a more visual introduction to the usage of the web.
+
+    h1. Usage
+
+    h2. Launching a job
+
+    MARQ offers two modes of operation: per-platform, and cross-platform. In
+    the first mode, per platform, the user inputs the query genes using the
+    same format of a given microarray platform in GEO. The per-platform mode of
+    operation only considers signatures in one particular platform, but
+    performs the query using all the original probes for that platform. The
+    cross-platform considers all the platforms for a given organism, but
+    translates both the probes in the datasets and the query genes to a common
+    gene Id format. This reduces the number of elements in each signature, as
+    different probes are associated to the same gene and some probes can not be
+    translated at all.
+
+    Performing a query entails selecting an organism, the platform to query, or
+    that a cross-platform must be performed, and the up and down gene lists. It
+    is also possible to specify just one of the up and down regulated gene
+    lists and have the other one ignored just by leaving it empty. Note that
+    when the two lists are used they both have the same weight in the final
+    score, regardless of the number of genes in each one.
+
+    h2. Results
+
+    The main page of results shows a table will all the signatures sorted by
+    their relationship with the query. The top of the lists shows signatures
+    with a direct relationship with the query, while the bottom shows
+    signatures with an inverse relationship. The hit-area left of the table
+    represents the complete list of signatures, the extremes are differently
+    colored indicating datasets with a significant p-value (after FDR
+    correction). Double clicking this hit-area will scroll the table to the
+    correspondent signature. This hit-area is also used to mark datasets
+    sharing annotation terms, as described below.
+    
+    Due to the heuristic criteria used in determining the "order of the
+    samples":/help/methods#comparisons in each comparison, signatures may have
+    their samples reversed from what would be their logical order, thus
+    to be found at one extreme of the list when they should intuitively appear at
+    the other. For this reason, it is important to check both the top and bottom
+    of the list. 
+
+    For each signature there are images that show the positions of the genes
+    from each query list in that signature. Each signature also has a hits page
+    for the up and down query lists that shows additional information about the
+    genes, like their rank in the signature, their synonyms, and, if the
+    dataset is a GEO dataset, a link to the genes profile in GEO. The values
+    for the log-ratios and t-values for the genes in the signatures, as
+    computed by the MARQ differential expression analysis pipeline, are also
+    available for download.
+
+    Also, each signature contains additional information such the text from the
+    title and description of the datasets or GO terms enriched in each
+    comparison (see "signature annotations":/help/methods#go_annotations for
+    details). This information is used in the annotations tool: Words in the
+    text of a dataset description and title may be clicked to mark other
+    signatures containing those same words, and similarly for GO based
+    annotations. Signatures sharing that particular annotation term are marked
+    as lines in the hit-area. Double clicking over one of those lines will
+    scroll to the relevant signature. An 'Annotations menu' allows to include
+    GO based annotations, which are not processed initially by default like
+    word annotations. It also shows which annotation terms are significantly
+    represented in the extremes of the signature list. This last functionality
+    shares the same scoring function as the actual signature scoring.     
+
+    Finally, two or more signatures may be selected for comparison. This
+    consists on a meta-analysis of the common genes to all these signatures
+    using "Rank Product":http://www.ncbi.nlm.nih.gov/pubmed/15327980. The main
+    assumption of this analysis is that a gene can be considered over-expressed
+    if it appears among the most over-expressed for all signatures.
+
+   
+

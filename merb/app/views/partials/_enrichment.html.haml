@@ -1,0 +1,17 @@
+- terms = info[:terms]
+.table
+  %table
+    %thead
+      %tr
+        %th.term Term
+        %th.pvalue Value
+    %tbody
+      - terms.each do |p|
+        - term = p[0]
+        - value = p[1]
+        %tr
+          %td.term
+            %a.mark{:href => '#'}= term
+          %td.pvalue= "%1.3g" % value
+:javascript
+  $('a.mark').click(function(){mark("Words", $(this).html());update_hits()} )

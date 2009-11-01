@@ -1,0 +1,10 @@
+:javascript
+  current = '#{@name}';
+
+%head  
+  %meta{ 'http-equiv' => 'refresh', :content => "15" }
+
+%center
+  %h2== Job #{@name} is being processed
+  %h4= @message
+  %img{:src =>"images/wait.gif"}

@@ -1,0 +1,37 @@
+#annotations
+  %h3#annotations_title 
+    Annotations Menu
+  %a#close_annotations_menu{:href => '#'} [X]
+  %div
+    %label{:for => 'annotations_select'} Show:
+    %select#annotations_select
+      %option{:value => ""} Select one:
+      %option{:value => "Words"} Words
+      /%option{:value => "Polysearch"} Polysearch
+      /%option{:value => "UMLS"} UMLS
+      %option{:value => "GO_direct"} GO terms directly related
+      %option{:value => "GO_inverse"} GO terms inversely related
+      %option{:value => "GOSlim_direct"} GO Slim directly related
+      %option{:value => "GOSlim_inverse"} GO Slim inversely related
+  %hr
+  %div#enrichment_table_div
+    %table#enrichment_table
+      %thead
+        %tr
+          %th Term
+          %th P-Value
+      %tbody
+
+:javascript
+  $('a#close_annotations_menu').click(function(){$('#annotations_menu').toggle('slow');return false;})
+  
+  $('#annotations_select').val("");
+  $('#annotations_select').change(function(){
+     update_annotations_table();
+     if ($('#enrichment_table_div').hidden){
+       $('#enrichment_table_div').show();
+     }
+    }
+  );
+  
+  

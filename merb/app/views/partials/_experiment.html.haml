@@ -1,0 +1,33 @@
+.exp_details
+  %h3.exp 
+    Description
+    %span.dataset= span_words(info[:dataset], false)
+
+  %p.description
+
+    = span_words(info[:description])
+
+
+  %h3.exp
+    Hits
+    %a.logratios{:href => "/logratios?experiment=#{escapeURI(@experiment)}&job=#{@job}&genes="} [Get logratios]
+    - if @experiment !~ /\[ratio\]/
+      %a.ts{:href => "/ts?experiment=#{escapeURI(@experiment)}&job=#{@job}&genes="} [Get t-values]
+
+
+  - if info[:up]
+    %p.hits
+      %a.hits{:href => "/experiment_hits?job=#{ @job }&experiment=#{ escapeURI(@experiment) }&side=Up", :target => "_blank" } 
+        U:
+        %img{:src => info[:up]}
+
+  - if info[:down]
+    %p.hits
+      %a.hits{:href => "/experiment_hits?job=#{ @job }&experiment=#{ escapeURI(@experiment) }&side=Down", :target => "_blank" } 
+        D:
+        %img{:src => info[:down]}
+
+  %p.annotations
+    %ul.annotation_types
+
+

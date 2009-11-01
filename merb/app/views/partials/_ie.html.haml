@@ -1,0 +1,19 @@
+#ie_warning
+  If you are using 
+  %span.ie internet explorer
+  and this site seems 
+  %span very slow 
+  you might
+  need to try a different browser like
+  %a{:href => "http://www.mozilla.com"} Firefox
+  ,
+  %a{:href => "http://www.apple.com/safari/"} Safari
+  or
+  %a{:href => "http://www.google.com/chrome/"} Google Chrome
+
+  :javascript
+    if (jQuery.browser.msie){
+      $('#ie_warning').show();
+    }
+
+

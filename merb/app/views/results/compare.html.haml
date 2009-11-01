@@ -1,0 +1,161 @@
+:javascript
+  current = '#{@job}';
+
+
+%h2#title
+  Results for: 
+  %a.job{:href => "/#{ @job }"}= @job
+  > Shared genes by selected signatures
+
+#compare
+  #genes_compare
+    .menu_links
+      %a.select_table.selected.button{:href => '#', :rel => 'table_up'} Top up regulated genes
+      %a.select_table.button{:href => '#', :rel => 'table_down'} Top down regulated genes
+      - if @genes_up.any?
+        %a.select_table.button{:href => '#', :rel => 'table_query_up'} Genes in the up query
+      - if @genes_down.any?
+        %a.select_table.button{:href => '#', :rel => 'table_query_down'} Genes in the down query
+      .clear_floats
+
+
+    %table#table_genes_headers
+      %thead
+        %tr
+          %th.name Name
+          %th.synonyms Synonyms
+          %th.pvalue P-Val
+    %div.table_scroller
+      - if @scores_up.any?
+        %table#table_up.data
+          %tbody
+            - @sorted_up.each do |p|
+              - gene = p[0]
+              - score = p[1][0]
+              - pvalue = p[1][1]
+              %tr{:id => gene}
+                %td.name 
+                  - url = gene_url(@org, gene)  
+                  - if url != nil
+                    %a.geneurl{:href => "#{url}"}= gene
+                  - else
+                    = gene
+                %td.synonyms= @synonyms[gene].uniq.join(", ")
+                %td.pvalue= print_pvalue pvalue, 0.00001
+
+      - if @scores_down.any?
+        %table#table_down.data
+          %tbody
+            - @sorted_down.each do |p|
+              - gene = p[0]
+              - score = p[1][0]
+              - pvalue = p[1][1]
+              %tr{:id => gene}
+                %td.name
+                  - url = gene_url(@org, gene)  
+                  - if url != nil
+                    %a.geneurl{:href => "#{url}"}= gene
+                  - else
+                    = gene
+                %td.synonyms= @synonyms[gene].uniq.join(", ")
+                %td.pvalue= print_pvalue pvalue, 0.00001
+
+      - if @genes_up.any?
+        %table#table_query_up.data
+          %tbody
+            - @scores_up.select{|gene, info| @genes_up.include?  gene}.sort{|a,b| a[1][0] <=> b[1][0]}.each do |p|
+              - gene = p[0]
+              - used = @translations[gene]
+              - score = p[1][0]
+              - pvalue = p[1][1]
+              %tr{:id => gene}
+                %td.name
+                  - url = gene_url(@org,gene)
+                  - if gene != used
+                    -if url.nil?
+                      = "#{ used } (#{ gene })"
+                    - else
+                      %a.geneurl{:href => "#{url}"}= "#{ used } (#{ gene })"
+                  - else
+                    - if url.nil?
+                      = gene
+                    - else
+                      %a.geneurl{:href => "#{url}"}= gene
+                %td.synonyms= @synonyms[gene].uniq.join(", ")
+                %td.pvalue= print_pvalue pvalue, 0.00001
+
+      - if @genes_down.any?
+        %table#table_query_down.data
+          %tbody
+            - @scores_down.select{|gene, info| @genes_down.include?  gene}.sort{|a,b| a[1][0] <=> b[1][0]}.each do |p|
+              - gene = p[0]
+              - used = @translations[gene]
+              - score = p[1][0]
+              - pvalue = p[1][1]
+              %tr{:id => gene}
+                %td.name
+                  - url = gene_url(@org,gene)
+                  - if gene != used
+                    -if url.nil?
+                      = "#{ used } (#{ gene })"
+                    - else
+                      %a.geneurl{:href => "#{url}"}= "#{ used } (#{ gene })"
+                  - else
+                    - if url.nil?
+                      = gene
+                    - else
+                      %a.geneurl{:href => "#{url}"}= gene
+                %td.synonyms= @synonyms[gene].uniq.join(", ")
+                %td.pvalue= print_pvalue pvalue, 0.00001
+
+    .menu_links
+      %a.tab.button{:href => @url + '&format=tsv'} Download in Tab Separated Values  
+      %a.excel.button{:href => @url + '&format=excel'} Download in Excel
+      .clear_floats
+  
+:javascript
+  function select_table(table){
+    $('table.data').each(function(){
+      if ($(this).attr('id') != table ){
+        $(this).hide();
+      }else{ 
+        $(this).show();
+      }
+    })
+  }
+
+  $(function(){
+    select_table('table_up');
+    $('.select_table').click(function(){
+      select_table($(this).attr('rel'))
+      return false
+    })
+  })
+
+:javascript
+  
+  function fit_size(){
+    var scroller = $('.table_scroller');
+    fit_window(scroller, 45)
+  }
+
+  
+  $(function(){
+    $('#genes_compare').width($('#table_genes_headers').width() + 20);
+    fit_size();
+    
+   $(".select_table").click(function () { 
+    $(".select_table").removeClass("selected");
+    $(this).addClass("selected"); 
+   });
+ 
+    $(window).resize(function(){
+      fit_size();
+    });
+    
+   $("#genes_compare").tabs();
+  
+  }) 
+  
+
+

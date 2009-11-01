@@ -1,0 +1,51 @@
+:javascript
+  current = 'translate'
+#translate
+  %form{:method => 'post', :enctype => "multipart/form-data"}
+     
+    #input
+      .parambox.select#organism
+        %h2.boxtitle Organism
+        %p 
+          Select the organism the genes belong to
+        %select#org{:name => 'org'}
+          - @organisms.each do |org|
+            %option{:value => org, :selected => (org == 'human')}= org
+
+      .textarea.parambox#original
+        %h2.boxtitle Original Genes
+        %textarea#missing{:name => 'missing'}= @missing.join("\n")
+
+    #output
+      .parambox.select#format
+        %h2.boxtitle Target ID
+        %p 
+          Select the format to which you wish the ids to be translated
+        %select#ids{:name => 'id'}
+          - @ids['human'].each do |id|
+            %option{:value => id}= id
+
+      .textarea.parambox#translations
+        %h2.boxtitle Translated Genes
+        %textarea#found{:name => 'found'}= @found.join("\n")
+
+    .parambox#submit.clear
+      %input{:type => 'submit'}
+
+  :javascript
+    eval('ids = #{@ids.to_json}')
+
+    $(function(){
+      $('select#org').change(function(){
+        $('select#ids').find('option').remove();
+        $(ids[$(this).val()]).each(function(){
+          $('select#ids').append("<option value='" + this + "'>" + this + "</option>")
+        })
+      })
+      $('select#org').val('human')
+    })
+
+:javascript
+  $(function(){
+    clear_textareas()
+  })

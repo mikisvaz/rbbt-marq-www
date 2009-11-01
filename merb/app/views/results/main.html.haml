@@ -1,0 +1,125 @@
+:javascript
+  current = '#{@name}';
+
+%h2#title
+  Results for: 
+  %span.jobname= @name
+  %span#status Loading Signature Table
+:javascript
+  var working = false;
+  var status_callback = null;
+  function set_status(text){
+    working = true;
+    $('#status').html(text).show();
+  }
+
+  function hide_status(){
+    working = false;
+    $('#status').hide();
+    if (status_callback != null){
+      status_callback();
+    }
+  }
+
+#results
+  #canvas
+ 
+  #table
+    
+    #annotations_menu
+      = partial 'partials/annotations'
+    
+    
+    .menu_links
+      %a#annotations_menu_link.button{:href => '#'} Annotations Menu
+      :javascript
+        $('#annotations_menu').hide()
+        $('#annotations_menu_link').click(function(){$('#annotations_menu').toggle('slow');return false;})
+      
+      %a#compare_link.button{:href => '#'} Compare signatures
+      .clear_floats
+      
+
+
+    %table#table_results_headers
+      %thead
+        %tr
+          %th.experiment Experiment
+          %th.score Score
+          %th.pvalue P-Val
+          %th.select Compare 
+          /&nbsp; &uarr; / &darr;
+    - total = @results.length
+    %div.table_scroller
+      %table#table_results
+        %tbody
+          - @results.each_with_index do |item,i|
+            - if i % (total/10) == 9 
+              - percent = ((100 * i) / total).to_i 
+              :javascript
+                set_status("Loading Signature Table  #{ percent }%")
+            - experiment = item[0]
+            - info       = item[1]
+
+            - if experiment =~ /^GDS|GSE/
+              - gds, condition, name = Info::parse_experiment(experiment).values_at(:gds, :condition, :name) 
+              - title, description = Info::GDS_info(gds).values_at(:title, :description)
+
+              %tr{:id => experiment}
+                %td.experiment
+                  %a.toggle{:href =>"#"} [+]
+                  %span.gds
+                    %span.title= span_words(title)
+                    -if gds =~ /GSE/
+                      %a.dataset{:href =>"http://www.ncbi.nlm.nih.gov/projects/geo/query/acc.cgi?acc=#{gds}",:target => "_blank"} [GEO]
+                    -else
+                      %a.dataset{:href =>"http://www.ncbi.nlm.nih.gov/sites/GDSbrowser?acc=#{gds}",:target => "_blank"} [GEO]
+                  %span.test
+                    = span_words(name)
+                    %span.condition== (#{ condition })
+                %td.score= "%1.3g" % info[:score] 
+                - if info[:pvalue] <= 0.05
+                  %td.pvalue.significant= print_pvalue info[:pvalue]
+                - else
+                  %td.pvalue= print_pvalue info[:pvalue]
+                %td.select
+                  %label{:for => "#{i}_up"} &uarr;
+                  %input.compare_select{:type => 'checkbox', :name => experiment, :id=> "#{i}_up" }
+                  %label{:for => "#{i}_down"} &nbsp;&nbsp;&darr;
+                  %input.compare_invert{:type => 'checkbox', :name => experiment, :id=> "#{i}_down"}
+            - else
+              - gds, condition, name = Info::parse_experiment(experiment).values_at(:gds, :condition, :name) 
+              - title, description, gpl = Info::CustomDS_info(gds).values_at(:title, :description, :gpl)
+              %tr{:id => experiment}
+                %td.experiment
+                  %a.toggle{:href =>"#"} [+]
+                  %span.gds
+                    %span.title= span_words(title)
+                    == (#{gds}) 
+                  %span.test  
+                    = span_words(name)
+                    %span.condition== (#{ condition })
+                %td.score= "%1.3g" % info[:score] 
+                - if info[:pvalue] <= 0.05
+                  %td.pvalue.significant= print_pvalue info[:pvalue]
+                - else
+                  %td.pvalue= "%1.3g" % info[:pvalue]
+                %td.select
+                  %label{:for => "#{i}_up"} &uarr;
+                  %input.compare_select{:type => 'checkbox', :name => experiment, :id=> "#{i}_up" }
+                  %label{:for => "#{i}_down"} &nbsp;&nbsp;&darr;
+                  %input.compare_invert{:type => 'checkbox', :name => experiment, :id=> "#{i}_down"}
+    %a#reset.button{:href =>"#", :onclick => "reset_checkboxes()"} Reset 
+
+
+:javascript
+  set_status("Resizing Table...")
+  var job = "#{@name}";
+  
+  var annotations = [];
+  var enrichment = [];
+
+  
+  $(start_results_main);
+  
+  

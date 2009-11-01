@@ -1,0 +1,54 @@
+:javascript
+  current = '#{@job}';
+
+%h2#title
+  Results for: 
+  %a.job{:href => "/#{ @job }"}= @job
+  > 
+  %span.jobname== #{ @name }
+
+
+- genes = []
+#hits
+  #canvas
+
+  #genes_hits
+    %table#table_genes_headers
+      %thead
+        %tr
+          %th.name Name
+          %th.synonyms Synonyms
+          %th.hit Pos.
+    %div.table_scroller
+      %table#table_genes
+        %tbody
+          - @hits.each do |p|
+            - genes << p[0][0]
+            %tr{:id => p[0][0]}
+              %td.name
+                - if p[0][0] != p[0][1]
+                  - name = "#{p[0][0]} (#{p[0][1]})"
+                - else
+                  - name = p[0][0]
+                - url = gene_url(@org, p[0][1])
+                - if ! url.nil?
+                  %a.geneurl{:href => "#{url}", :blank => "_target"}= name
+                - else
+                  = name
+                - if @gds
+                  %a.button.profile{:href => "http://www.ncbi.nlm.nih.gov/sites/entrez?db=geo&term=#{@gds}[ACCN]+(#{@translations[p[0][1]].join("OR ")})", :blank => "_target"} GDS
+              %td.synonyms=@synonyms[p[0][1]].uniq.join(", ")
+              %td.hit=p[1]
+
+    .menu_links
+      %a.selected_genes.button{:href => '#'} Get selected genes
+      %a.logratios_hits.button{:href => %"/logratios?experiment=#{escapeURI(@name)}&job=#{@job}&genes=#{genes.join(",")}"} Get logratios
+      - if @name !~ /\[ratio\]/
+        %a.ts_hits.button{:href => "/ts?experiment=#{escapeURI(@name)}&job=#{@job}&genes=#{genes.join(",")}"} Get t-values
+      .clear_floats
+
+:javascript
+
+  var total_genes = #{@total}
+
+  $(start_results_hits);

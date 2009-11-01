@@ -1,0 +1,18 @@
+#images
+
+  %h1= @experiment
+
+  - upfile = "/results/images/#{@name}/up/#{@hash}.png"
+  - downfile = "/results/images/#{@name}/down/#{@hash}.png"
+
+  %p
+  - if File.exist? File.join('public', upfile)
+    %h2 Up
+    %p
+      %img{:src => upfile}
+
+  - if File.exist? File.join('public', downfile)
+    %h2 Down
+    %p
+      %img{:src =>downfile}
+

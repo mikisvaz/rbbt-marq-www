@@ -1,0 +1,301 @@
+:javascript
+  current = 'help'
+#methods
+
+
+  =partial 'menu', :selected => 'meth'
+
+  :redcloth
+
+    h1. Signature Database generation
+
+    We use NCBI E-utils to determine all available platforms and datasets for
+    each supported organism. Each dataset is loaded into R using the GEOquery
+    package and a differential expression analysis is performed using limma.
+    Linear data are log transformed. The results from the differential
+    expression analysis are used to sort the genes in the dataset to generate
+    the signatures. We perform one differential analysis for each of the
+    "comparisons":/help/methods#comparisons between samples. If limma succeeds
+    in performing the analysis, then the resulting t-values are used to rank
+    the genes in the signature. If it fails, due to lack of sample replicates
+    for example, we resort to the log ratios.
+
+    Each dataset is process two times: once using the original data, and once
+    after all the probe ids are "translated":/help/methods#translations into
+    a common id format.
+
+    h3(#comparisons). Comparisons
+
+    Each datasets has one or more features, which represent experimental
+    conditions (what is commonly referred to as the phenotype), that group
+    samples into classes. For instance, a feature could be the _tissue_, and
+    the classes would be _tumor_ or _normal_. For each of the features we
+    compare classes one to one. We do not define sub-classes by combining
+    classes from different features. If one of the classes is identified as a
+    control class, then all other classes are compared against it. If not, all
+    classes are compared against each other.  The particular order in this last
+    case is arbitrary and may result in making some comparison in a different
+    order from what would be expected (A vs B or B vs A).  At the time of this
+    writing, a class is considered a control if it contains one of the
+    following terms in its description: @none@, @control@, @normal@, @wild@,
+    @baseline@, @untreated@, @uninfected@, @universal@, @reference@, @wt@, or
+    @vehicle@.
+
+
+    h1(#score). Signature Comparison
+
+    Signature comparison consists in assigning a score to a signature based on
+    the positions of the query genes. The signature been the list of genes
+    ranked by differential expression in the corresponding comparison. The
+    query genes are divided in two lists, up-regulated genes and down-regulated
+    genes. Each of the two lists receives a score, the final score is the
+    combination of the scores for both lists. We may call each of these scores
+    !/images/meth/S_up.gif! for the up-regulated list and
+    !/images/meth/S_down.gif! for the down-regulated list. Each of these two
+    scores is calculated using the following procedure:
+
+    * Let !/images/meth/Q.gif! be the set of !/images/meth/q.gif! genes in the
+      correspondent query list (up-regulated or down-regulated). Let
+      !/images/meth/G.gif! be the list of !/images/meth/g.gif! genes in the
+      signature sorted by their differential expression value (t-value or log-ratio).
+      Consider in !/images/meth/Q.gif! only those genes appearing in the
+      signature list !/images/meth/G.gif!, the rest are considered missing, let
+      !/images/meth/m.gif! be the number of such missing genes.
+
+
+    * Genes at the top or bottom extremes of the signature are the most
+      up-regulated and down-regulated respectively, and their contribution is
+      weighted higher in the score. Genes receive a weight that is a function of
+      their position in the signature. We define !/images/meth/d.gif! as the
+      distance of gene !/images/meth/i.gif! to the center of the signature scaled
+      to be !/images/meth/d_range.gif!: !(large)/images/meth/d_formula.gif!.
+      Where !/images/meth/p.gif! is the position in the signature.
+      The distances !/images/meth/d.gif! are used to compute the weights for each
+      gene !/images/meth/w.gif! using a "weight function":#weight
+      !/images/meth/weight.gif! 
+
+    * Missing genes are penalized using a penalty term
+     !/images/meth/penalty.gif! that will be used in the next formula
+
+    * The genes in the query list may be over-represented at the top of the
+     signature or at the bottom. We calculate a separate partial score for each
+     event, !/images/meth/PS_top.gif! and !/images/meth/PS_bottom.gif!, at each
+     position !/images/meth/i.gif!. !(large)/images/meth/PS_top_formula.gif! and
+     !(large)/images/meth/PS_bottom_formula.gif!
+
+    * The score assigned to the list (!/images/meth/S_up.gif! or
+     !/images/meth/S_down.gif!) is the maximum value in
+     !/images/meth/PS_top.gif! or !/images/meth/PS_bottom.gif!. If the value
+     comes from !/images/meth/PS_bottom.gif!, then the list score is made
+     negative
+
+    The previous process is used to generate !/images/meth/S_up.gif! and
+    !/images/meth/S_down.gif!, the scores for the up-regulated and
+    down-regulated gene lists. If one of the lists is empty its correspondent
+    score is 0. The final score for the query is 0 if both
+    !/images/meth/S_top.gif! and !/images/meth/S_bottom.gif! have the same sign
+    and are non-zero, or !/images/meth/S_diff.gif! if they have different
+    signs.  Note that the sign of the final score indicates if the relationship
+    of the signature to the query is direct or inverse.
+
+    The significance of the score is established using a permutation test. The null
+    distribution is estimated by finding 1000 scores for random queries of the
+    same length as the original.
+    
+    h3(#computations). Computational details
+
+    Each query in MARQ may be compared with two or three thousand different
+    signatures, which makes computation time an important issue. Each
+    comparison involves computing the score for the query genes and comparing
+    it to 1000 scores derived from selecting random sets of genes of the same
+    size to establish the score significance. In order to save computations,
+    the permutations scores are pooled for signatures of the same size. This is
+    possible thanks to the fact that the scores depend only on the positions of
+    the query genes, which are permuted, and the size of the signature, which
+    remains the same; since each dataset in each particular platform covers the
+    same probes, all their signatures derived from datasets of the same
+    platform have the same length. This enables us to compute the 1000
+    permutations scores once per platform, instead of once per signature, and
+    thus save plenty of time.
+
+
+    h3(#weight). Weight function
+
+    The vanilla version of the scoring function, as proposed in the
+    Connectivity Map, suffers from the problem that if query genes cluster
+    towards the center of the signature they receive a high score, which
+    is not commonly regarded as an interesting finding. The latest versions of
+    GSEA make use of the correlation with the phenotype to weight the
+    importance of genes, such that genes in the center of the signature will
+    not produce a high score since their weight will be small.
+
+    In MARQ, however, this alternative is unfeasible, since using the
+    correlation with the phenotype will no longer enable us to pool permutation
+    scores between signatures from the same platform. This happens because the
+    scores will now depend in values that are specific for each signature, as is
+    the case with the correlation with the phenotype, and the permutation scores 
+    would follow different distributions and will cease to be exchangeable under 
+    the null hypothesis, a requirement for permutation tests.
+
+    To avoid this problem, instead of the original correlation with the
+    phenotype, we define a weight function that serves a similar purpose,
+    weighting genes in the extremes more than genes towards the center, but
+    that would be the same for all signatures. In theory, any function that
+    achieves this goal could be appropriate, however, to remain faithful to the
+    original idea proposed in GSEA, we use a function that mimics the average
+    distribution of the log-ratios of the genes. 
+
+    The following picture shows the values of the log-ratios for 50 signatures
+    selected at random. Genes are sorted by the log-ratios, the horizontal axis
+    shows the value of the distance !(large)/images/meth/d_noabs.gif!  (in this
+    case we do not take the absolute value for illustration purposes) and the
+    vertical axis shows the absolute value of the log-ratio normalized to be in
+    the 0 to 1 range by dividing by the largest value (this normalization does
+    not affect the scores). Each black line represents one of the 50 signatures.
+    The red vertical lines show the places where the values change signs. The
+    blue line represents the average of the signature values at each point. As
+    we can see, the function is relatively symmetric and predictable, the sign
+    changes close to the center, and the shape is a slow increase in the middle
+    and a steep bump in the extremes
+
+    !(plot)/images/meth/Rplot.png!
+
+    The weight function we use is defined as
+    !(large)/images/meth/weight_function.gif!, in this case
+    !/images/meth/d.gif! is defined as "here":/help/methods#score, taken
+    the absolute value. The parameters for this function are fitted using
+    non-linear least squares. The results is the green line in the plot. The
+    values for the parameters are approximately !/images/meth/alpha.gif!
+    !/images/meth/beta_0.gif!  !/images/meth/beta_1.gif!.
+
+    The data and R scripts to reproduce this analysis can be obtained
+    "here":/data/weights.tar.gz
+
+
+    h1(#translations). Translation system
+
+    Each organism has a file that specifies all the equivalences between gene
+    id formats. This file is built by merging information from the Entrez Gene
+    downloadable data files, data files available in organism specific
+    databases, such as SGD for yeast or MGI for mouse, and information
+    extracted from BioMart. In particular, all platform specific formats are
+    extracted from BioMart. Each organism has a configuration file specifying
+    all the data sources and how to process them, which is done automatically.
+    This information is updated periodically.
+
+    For each organism one of the id formats is selected as the native format.
+    This native format the target of all gene id translations, and glues all the
+    information regarding each gene in the system. The native format is selected
+    to have a wide coverage; it is usually the organism specific database id,
+    like SGD and MGI for yeast and mouse. For human the native format is Entrez
+    Gene.
+
+    The translation system takes each gene identifier and finds the
+    correspondent native format id. All the formats are sorted for relevance to
+    resolve matches; so if a gene identifier matches an _Entrez Gene Alias_ for
+    a particular gene, and a _Gene Symbol_ for another, the later is chosen,
+    since the _Entrez Gene Alias_ lists names not in favor anymore.
+
+    The translation system is used to translate probe ids and query genes for
+    cross platform queries. Each platform names its probes using a particular
+    id format, which may or may not be one of the formats included in our
+    equivalence file. Fortunately, platforms usually include other information
+    fields for the probes that list ids in other formats. It the primary probe
+    id format is unknown, we search the other fields until we find one that we
+    can translate. To determine if whether the primary format or any of the
+    others are suitable for translation we perform the actual translation and
+    count the number of different genes we translate to. We call the coverage
+    of the translation to the number of target genes we reach. We use the
+    coverage to select the field to use in the translation. Platforms with a
+    coverage amounting to less than 10% of the original probe ids are
+    considered not translatable by the system.
+
+    AILUN is also used for platform translations. The target format for AILUN
+    is always Entrez Gene, which means that we need a second translation to our
+    native format for all organisms except human, which already have Entrez as
+    the native format. After this second translation we measure the coverage of
+    both systems for that platform and select the best one.
+
+    
+    h1(#annotations). Signature Annotations
+
+    Each signature receives annotations of several types. Each annotation type
+    defines a number of terms that are shared among different signatures. To
+    determine if a term is significantly represented in the results signature
+    list we use the same "score function":#score as with comparing signatures,
+    in this case the signature list is like a signature itself and the
+    individual signatures are like the genes.
+
+    Since some signatures may have their comparison levels swapped (see
+    "comparisons":#comparisons) and end up in the wrong side of the list, we
+    sort the signatures by the absolute score value, so all significant
+    signatures end up at the top, regardless of the direction of the
+    association with the query. This means, of course, that we only consider
+    terms to be relevant if their appear in the top signatures, since the
+    bottom signatures are actually at the middle of the table.
+
+    Also, some datasets with many factors and levels per factor may have a
+    large number of signatures. Terms derived from the datasets description,
+    for example, will be over-represented for that reason. Not only that, but
+    often signatures from the same dataset tend to cluster together, which only
+    aggravates the problem. To deal with this problem we consider differently
+    terms derived from the datasets and thus common to all its signatures, and
+    terms specific to each signature. Terms derived from the datasets are only
+    considered for the best ranking signature.
+    
+    This a brief description of the two types of annotations currently used
+
+    * Words: Each signature is annotated with the text from the datasets
+    description and title, as well as the text from the levels been compared.
+    As we discussed in a previous paragraph, the text from the levels is
+    specific to the signature and always considered, while the text from the
+    description and title of the dataset is only considered once. The text is
+    parsed into words, the words are stemmed, and the resulting terms are used
+    to annotate the signature. Terms that appear in more than 5% of the
+    signatures are removed from the analysis, as they are to general to be
+    interesting.
+
+
+    *(#go_annotations) Gene Ontology: For each signature we extract the up and
+    down regulated genes. For this we could make use of the t-values used to
+    produce de signatures, but for simplicity's shake, we just take the 100
+    first and the 100 bottom genes.
+    This approach gave better results than using the t-values due to the fact
+    that the t-values where missing on some signatures (due to lack of sample
+    replicates) or their distribution varied so greatly that the sizes of the
+    lists of significant genes where to diverse. Each signature is assigned a
+    list of GO terms over-represented in the top genes and another list for the
+    bottom genes, and similarly for GOSlim terms. We use the
+    "GeneCodis":http://genecodis.dacya.ucm.es engine to find over-represented GO term
+    for the category of _Biological Process_. For each query the 'directly
+    related terms' are those that appear over-expressed in the top genes for
+    signatures positively co-related to the query, and over-expressed in the
+    bottom genes for signatures negatively co-related. Vice versa for the
+    'indirectly related terms'.   
+    
+
+    h1. Rank Product Signature Comparisons
+
+    Two or more signatures can be compared using Rank Products. The Rank
+    Product score is computed by multiplying the relative ranks of the gene in
+    each of the signatures. The relative rank is the rank divided by the number
+    of genes in the signature. Genes missing in any of the signatures are
+    ignored.
+    
+    The significance of a Rank Product score is established using a
+    permutations test. We use a modification of the permutation test proposed
+    in the standard Rank Product implementation: We sample the null
+    distribution by drawing a random number from 0 to 1 representing the
+    relative rank of a gene, one for each signature, and computing the score
+    for those. We produce 5000 of this random scores. "Empirical
+    tests":/data/RankProd.tar.gz show that these permutations follow the same
+    distribution that scores drawn using the standard permutations used in the
+    original implementation of Rank Product, and are more efficient. Note that
+    this only works because our signatures are considered all to be from the
+    same class. In the general two class case one still needs the complete
+    permutation scheme.
+
+
+
+
+

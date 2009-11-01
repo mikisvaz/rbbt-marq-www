@@ -1,0 +1,23 @@
+= light_color_link(!light_font_color)
+  :color= !light_font_color
+  &:visited, &:link 
+    :color= !light_font_color
+    :text-decoration none
+  &:hover
+    :color red
+    :text-decoration none
+
+= button(!background_color, !hover_color, !hover_background_color, !round_corner_radius= 5)
+  +round-corners(!round_corner_radius)
+  :color black
+  :text-decoration none
+  :text-align center
+  :font-weight bold
+  :font-size 0.9em
+  :background-color= !background_color
+  :padding 1px 4px 1px 4px
+  &:hover
+    :background-color= !hover_background_color
+    :color= !hover_color 
+
+

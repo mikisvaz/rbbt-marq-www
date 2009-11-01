@@ -1,0 +1,99 @@
+:javascript
+  var series = "#{@series}";
+  current = 'series';
+#series
+  %form{:action => "/series", :method => 'post'}
+    %p
+      The server needs to retrieve all the sample data from GEO the first time, this might take a few minutes...
+    %p
+      %input{:name => "series", :value => @series}
+      %input{:type => 'submit'}
+  
+    - if @series
+      %dl
+    
+        %dt Series
+        %dd
+          %a{:href =>"http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=#{@series}"}= @series
+        - if @gds
+          %dt Dataset
+          %dd This series has a GDS
+        %dt Platform
+        %dd
+          %a{:href =>"http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=#{@series_info[:platform]}"}= @series_info[:platform] 
+        %dt Title
+        %dd= @series_info[:title]
+        %dt Description
+        %dd= @series_info[:description]
+      
+      %a.add.button{:href =>'#'} add new condition
+      %table#samples
+        %thead
+          %tr
+            %th Sample
+            %th Title
+            %th.phenotype
+              %input{:value => 'condition', :size => '6'}
+              %a.del{:href =>'#'} del
+        %tbody
+          - @series_info[:samples].each do |gsm|
+            %tr{:id => gsm}
+              %td.gsm{'data-description' => @sample_info[gsm][:description]}= gsm
+              %td= @sample_info[gsm][:title]
+              %td.value
+                %input{:size => '8'}
+     
+      %a.gen.button{:href =>'#'} Generate description file
+      
+:javascript
+  function add(){
+    table = $('table#samples');
+    table.find('thead tr').append(tag('th').addClass('phenotype').append(tag('input').attr('value','condition').attr('size',8)).append(tag('a').addClass('del').attr('href','#').html('del')));
+    table.find('tbody tr').append(tag('td').addClass('value').append(tag('input').attr('size', 10)));
+    $('a.del').click(del);
+    return(false);
+  }
+
+  function del(){
+    $(this).parents('th').attr('data-selected', true);
+    i = 1;
+    $(this).parents('tr').find('th').each(function(){
+      if ($(this).attr('data-selected'))
+        return(false);
+      i += 1;
+    })
+
+    position = i;
+
+    table = $('table#samples');
+    table.find('thead tr th:nth-child(' + position + ')').remove()
+    table.find('tbody tr td:nth-child(' + position + ')').remove()
+    return(false);
+  }
+
+  function description_file(){
+
+    var conditions = [];
+    $('table thead tr th.phenotype input').each(function(){
+     conditions.push($(this).val());
+    })
+
+    var  values = [];
+    $('table tbody tr td.value input').each(function(){
+     values.push($(this).val());
+    })
+
+
+    window.location = "/series?series=" + series + "&conditions=" + conditions.join("|") + "&values=" + values.join("|")
+    return(false);
+  }
+
+
+  $(function(){
+    $('a.add').click(add);
+    $('a.del').click(del);
+    $('a.gen').click(description_file);
+  })
+
+
+ 

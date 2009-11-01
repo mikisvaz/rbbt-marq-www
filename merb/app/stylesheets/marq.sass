@@ -1,0 +1,561 @@
+@import blueprint/screen.sass
+@import includes/rounded_corners.sass
+@import includes/marq_mixins.sass
+
+!outside_color = #E1E6FA
+!header_color = #183152
+!color_highlight = #ABC8E2
+!light_font_color = #808080
+!background_color = white
+
+!header_height = 50px
+
+!font_size = 14px
+
+!page_width = 990px
+
+body
+  :font-size= !font_size 
+  :font-family 'Lucida Grande',Arial,sans-serif      
+  :background-color= !outside_color 
+  :text-align center
+  :border 0
+  :padding 0
+
+
+#layout
+  :text-align left
+  :background-color white
+  :width= !page_width
+  :margin auto
+  
+#ie_warning
+  :display none
+  :margin auto
+  :width auto
+  :text-align center
+  :background-color= !outside_color
+  span
+    :color red
+
+///* HEADER STYLES */
+#header
+  :position relative
+  :background-color= !header_color  
+  :height= !header_height
+  :background-image= url("../images/top.png")
+  :background-repeat no-repeat
+  :width= !page_width
+  
+  ul
+    :position absolute
+    :bottom 0
+    :right 0
+    :padding 0
+    :margin 0
+    :list-style-type none
+  li
+    +round-corners-top(5)
+    :float left
+    :width auto
+    :margin 0
+    :padding 0 30px
+
+    :background-color= !color_highlight
+    :font-weight bold
+    :text-align center
+
+    a
+      :color black
+      :text-decoration none
+
+    &:hover
+      :background-color #596c85
+      :color #e2e2e7
+      a:hover
+        :color white
+
+
+    &.selected
+      :background-color white
+      &:hover
+        :background-color none
+        :color black
+      a:hover
+        :color black
+                 
+#content
+  :margin 0
+  :padding 10px 30px 10px 30px
+
+///* TRANSLATE PAGE STYLES */
+//
+
+!text_area_height = 189px
+
+!translate_input_size = 400px
+!translate_output_size = 400px
+!translate_middle_margin = 100px
+#translate
+  #input
+    :display inline-block
+    :width= !translate_input_size
+  #output
+    :display inline-block
+    :margin-left= !translate_middle_margin
+    :width= !translate_output_size
+///* MAIN PAGE STYLES */
+//
+!main_genes_width = 400px
+!main_parameters_width = 400px
+!main_middle_margin = 100px
+#main
+  
+  #index_video
+    :display none
+
+  #ad_video
+    :float right
+    :color= !light_font_color
+    :margin-bottom 10px
+
+  #genes
+    :width= !main_genes_width
+    :display inline-block
+    :position relative
+    :float left
+
+  #parameters
+    :width= !main_parameters_width
+    /*:margin-left= !main_middle_margin
+    :display inline-block
+    :position relative
+    :float right
+
+  #submit
+    :text-align center
+  #logos
+    :clear both
+    hr
+      :color #d9d9d9 
+    a
+      :text-decoration none 
+      img
+        :padding-left 2%
+        :padding-right 2%
+        :border 0
+        :margin 0
+
+.parambox
+  :position relative
+  :width 100%
+  :margin-top 30px 
+  :margin-bottom 50px 
+  p
+    :padding-top 15px
+    :text-align justify
+
+.textarea
+  :position relative
+  :margin-top 30px
+  :margin-bottom 50px
+  :width 100%
+  :height= !text_area_height
+  h2.boxtitle
+    :left 10px
+textarea
+  :height= !text_area_height
+  :width 100%
+
+h2.boxtitle
+  :background-color white
+  :position absolute
+  :top -18px
+  :left -10px
+  :margin 0
+  :font-size 1.2em
+  /*:z-index 999
+
+a.textarea_link
+  +light_color_link(!light_font_color)
+  :position absolute
+  :background-color white
+  :top -15px
+  :right 20px
+  /*:z-index 999
+
+a.toggle, a.ts, a.logratios 
+  +light_color_link(!light_font_color)
+
+#fill
+  :margin-top -40px
+  :float left
+
+
+
+
+///* RESULTS PAGE STYLES */
+
+!table_scroll_padding= 80px
+
+!canvas_width= 30px
+!table_font_size= 11px
+
+!results_table_select= 75px
+!results_table_experiment = 620px
+!results_table_score= 50px
+!results_table_pvalue= 60px
+!results_table_total= !results_table_select + !results_table_experiment + !results_table_score + !results_table_pvalue
+!results_scroller_size= !results_table_total + !table_scroll_padding
+
+!results_info_description_size= !results_table_experiment - 50px
+
+!results_table_experiment_first= !results_table_experiment * 60 / 100
+!results_table_experiment_seccond= !results_table_experiment * 30 / 100
+#results
+  :width auto
+  :position relative
+  .table_scroller
+  #table
+    :display inline-block
+    :position relative
+    :width= !results_scroller_size
+  table
+    :width= !results_table_total
+    th, td
+      &.experiment
+        :width= !results_table_experiment
+        :border-left none
+      &.score
+        :width= !results_table_score
+      &.pvalue
+        :width= !results_table_pvalue
+        :border-right none
+      &.select
+        :width= !results_table_select
+        :border-right none
+        :padding-right 0
+  td.pvalue.significant
+    :font-weight bold
+  .hits
+    &:visited, &:link 
+      :color blue
+      :text-decoration none
+    &:hover
+      :color red
+      :text-decoration none
+
+.toggle
+  +light_color_link(!light_font_color)
+  :float right
+  :margin-left 5px
+
+.gds
+  :display inline-block
+  :width= !results_table_experiment_first
+  :float left
+  :padding 0
+  :margin 0
+  :text-align justify
+  :overflow hidden
+  :display inline
+
+.test
+  :display inline
+  :width= !results_table_experiment_seccond
+  :float right
+  :padding 0
+  :margin 0
+  :padding-right 3px
+.condition
+  :color= !light_font_color
+
+.compare_select, .compare_invert
+  :margin-left 0
+.info
+  h3
+    :margin-bottom 10px
+  span.dataset 
+    :font-size small
+  p 
+    :width= !results_info_description_size
+    :margin-top 10px
+    :margin-bottom 20px
+  .logratios, .ts
+    :font-size 0.8em
+  .hits
+    :font-weight bold
+  img
+    :float right
+    :width= !results_info_description_size - 17px
+    :height 10px
+    :text-align right
+    :border 1px solid
+.exp_details
+  :padding-top 30px
+  :text-align justify
+
+.annotation_types
+  :list-style-type none
+  :margin 0
+  :padding 0
+  & > li
+    :width auto
+    .title
+      :width 90px
+      :font-weight bold
+      :float left
+      span.bold
+        :font-weight bold
+        :font-size 12px
+.annotations
+  :list-style-type none
+  :margin 10px
+  :margin-left 100px
+  :padding 0
+  li
+    :display inline-block
+    :margin-left 15px
+    :border-bottom 1px solid
+    :cursor pointer
+    &:hover
+      :background-color= !color_highlight
+.word.click
+  :cursor pointer
+  &:hover
+    :background-color= !color_highlight
+
+#annotations_menu_link
+  :float right
+  :margin-right 25px
+#compare_link
+  :float right
+
+#reset
+  :float right
+  :margin-top 5px
+  :margin-right 25px
+
+
+///* ANNOTATIONS MENU */
+
+#annotations_menu
+  +span(7)
+  :padding 5px
+  :background white
+  :border 1px solid black
+  :position absolute
+  :top 50px
+  :right 10px
+  #enrichment_table_div
+    :overflow-y auto
+    :overflow-x hidden
+    :display none
+
+  #enrichment_table
+    :margin-top 5px
+    :table-layout auto
+    :width 100%
+  td.term
+    :cursor pointer
+    &:hover
+      :background-color= !color_highlight
+
+#annotations_select
+  :font-size 0.8em
+  :width 212px
+
+#annotations_title
+  :text-align center
+  :margin 3px
+  :margin-right 15px
+  :margin-bottom 10px
+  :color #e2e2e7
+  :background-color #183152
+
+a#close_annotations_menu
+  :position absolute
+  :top 6px
+  :right 2px
+  :text-decoration none
+  :color #183152
+  :font-weight bold
+  :font-size 0.8em
+
+///* GENE HITS PAGE */
+!hits_table_name = 100px
+!hits_table_synonyms= 620px
+!hits_table_hit= 50px
+!hits_table_total= !hits_table_name + !hits_table_synonyms + !hits_table_hit
+!hits_scroller_size= !hits_table_total + !table_scroll_padding
+#hits
+  :width auto
+  :position relative
+  .table_scroller
+  #genes_hits
+    :position relative
+    :display inline-block
+    :width= !hits_scroller_size
+  table
+    :width= !hits_table_total
+    th, td
+      :font-size= !table_font_size
+      &.name
+        :width= !hits_table_name
+        :border-left none
+      &.synonyms
+        :width= !hits_table_synonyms
+      &.hit
+        :width= !hits_table_hit
+        :border-right none
+  .menu_links
+    a.selected_genes
+      :float left
+      :margin-left 0px
+    a.logratios_hits
+      :float left
+    a.ts_hits
+      :float left
+
+///* COMPARE SIGNATURES */
+!compare_table_name = 100px
+!compare_table_synonyms= 630px
+!compare_table_pvalue= 70px
+!compare_table_total= !compare_table_name + !compare_table_synonyms + !compare_table_pvalue
+!compare_scroller_size= !compare_table_total + !table_scroll_padding
+#compare
+  :width auto
+  :position relative
+  .table_scroller
+  #genes_compare
+    :position relative
+    :display inline-block
+    :width= !compare_scroller_size
+  table
+    :width= !compare_table_total
+    th, td
+      &.name
+        :width= !compare_table_name
+        :border-left none
+      &.synonyms
+        :width= !compare_table_synonyms
+      &.pvalue
+        :width= !compare_table_pvalue
+        :border-right none
+  a.selected
+    :background-color white
+    &:hover
+      :color black
+  .menu_links
+    a
+      :float left
+      
+
+///* HELP PAGE */
+!help_width = 700px
+#help, #methods, #supplementary, #quick
+  :width= !help_width
+  :margin auto
+  p
+    :text-align justify
+  .menu a
+    +button(!color_highlight,  #596c85, #e2e2e7, 5)
+    &.selected
+      :background-color white
+      &:hover
+        :color black
+#video
+  :display none
+  :padding 0
+  :border 0
+  :margin 0
+#quick
+  img
+    :width auto
+    :border 2px solid
+    :padding 5px
+    :max-width= !help_width
+  .toggle_example
+    +light_color_link(!light_font_color)
+#supplementary, #methods
+  img
+    :height 1.2em
+    :vertical-align middle
+    &.large
+      :height 3em
+    &.plot
+      :height 100%
+      :margin auto
+/* GENERAL STYLES */
+table
+  :table-layout fixed
+  :border-collapse collapse
+  :font-size= !table_font_size
+  th
+    :margin 0px
+    :padding 5px 8px 5px 8px
+    :text-align center
+    :border 1px solid white
+    :color white
+    :background-color= !header_color
+    :text-align center
+  td
+    :padding 8px
+    :border solid 1px black
+    :color= !header_color
+tr.marked 
+  td
+    :background-color= !outside_color
+    &.name
+      :font-weight bold
+.table_scroller
+  :overflow auto
+  :border-bottom solid 1px
+#canvas
+  :float left
+  :position relative
+  :width= !canvas_width
+  :border solid 2px #596c85 
+  :cursor pointer
+h2#title
+  :margin 0 0 5px 0
+  :width auto
+a.job
+  &:visited, &:link 
+    :color blue
+    :text-decoration none
+  &:hover
+    :color red
+    :text-decoration none
+a.profile
+  :float right
+  :display inline
+  :font-size 0.7em
+
+a.geneurl
+  :float left
+  :display inline
+  &:visited, &:link 
+    :color blue
+    :text-decoration none
+  &:hover
+    :color red
+    :text-decoration none
+
+.menu_links
+  :position relative
+  .button
+    :margin 2px 5px
+
+.jobname
+  :color= !color_highlight
+#status
+  :font-style italic
+  :color= !light_font_color
+  :font-size 0.8em
+
+.button
+  +button(!color_highlight,  #596c85, #e2e2e7, 5)
+
+.clear_floats
+  :clear both

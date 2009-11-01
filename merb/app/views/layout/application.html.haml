@@ -1,0 +1,27 @@
+!!!
+%html
+  %head
+    %meta{ 'http-equiv' => 'Content-Type', :content => 'text/html;charset=utf-8' }
+    %title= @title
+
+    %link{ :rel => "shortcut icon", :href => "/images/favicon.ico"}
+    = css_include_tag('thickbox', 'marq',  :bundle => 'marq_all')
+    = js_include_tag('wz_jsgraphics', 'jquery', 'jquery.scrollTo', 'jquery-ui.core', 'jquery-ui.hitarea', 'marq', 'jquery.tabs', 'thickbox','marq_pages', :bundle => 'marq_all')
+
+  %body
+    #layout
+      = partial 'partials/ie'
+      #header
+        %ul
+          %li.analysis 
+            %a{:href => '/'} New analysis
+          %li.help 
+            %a{:href => '/help'} Help
+      #content
+        = catch_content :for_layout
+        #clear_floats
+      #footer
+      :javascript
+        $('#header > ul > li.' + current).addClass('selected')
+
+
