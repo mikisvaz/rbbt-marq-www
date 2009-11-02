@@ -16,6 +16,8 @@ require 'rand'
 require 'spreadsheet'
 require 'ruby-yui'
 require 'redcloth'      
+require 'rbbt/util/misc'      
+require 'stemmer'
 
 Merb::Config.use do |c|
   c[:use_mutex] = false
