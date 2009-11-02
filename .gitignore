@@ -19,3 +19,11 @@ rdoc
 pkg
 
 ## PROJECT::SPECIFIC
+.RData
+.Rhistory
+merb/public/results/
+merb/public/tmp/
+merb/public/stylesheets/marq*.css
+merb/public/stylesheets/includes
+install_scripts/CustomDS/sgd
+merb/public/javascripts/marq_all.js
