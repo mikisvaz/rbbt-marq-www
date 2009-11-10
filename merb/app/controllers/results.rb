@@ -201,7 +201,16 @@ class Results < Application
 
     @url = "/compare?" + request.env['QUERY_STRING']
     @job = job
-    
+    case
+    when format == 'tsv'
+      headers["Content-Type"] =  'text/plain'
+      headers["Content-Disposition"] =  'attachment; filename=rankproduct.txt'
+    when format == 'excel'
+      headers['Content-Type'] = "application/vnd.ms-excel"
+      headers['Content-Disposition'] = "attachment; filename=\"rankproduct.xls\""
+      headers['Cache-Control'] = ''
+    end
+  
     render_deferred do
       genes = WS::genes(job)
       @genes_up   = genes[:up] || []
@@ -218,17 +227,9 @@ class Results < Application
       case
       when format == 'tsv'
         filename = CompareGenes::RankProduct.prepare_files(job, signatures, invert, @genes_up, @genes_down)[0]
-        headers["Content-Type"] =  'text/plain'
-        headers["Content-Disposition"] =  'attachment; filename=rankproduct.txt'
-  
-  
         Open.read(filename)
       when format == 'excel'
         filename = CompareGenes::RankProduct.prepare_files(job, signatures, invert, @genes_up, @genes_down)[1]
-        headers['Content-Type'] = "application/vnd.ms-excel"
-        headers['Content-Disposition'] = "attachment; filename=\"rankproduct.xls\""
-        headers['Cache-Control'] = ''
-  
         Open.read(filename)
       else
         cache('compare', params) do

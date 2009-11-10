@@ -63,8 +63,11 @@ function up_down(){
   down = 0;
   experiments.each(function(){
     var e = $(this);
-    var pvalue = parseFloat(e.find('td.pvalue').html());
+    var str = e.find('td.pvalue').html();
+    if (str.match(/0\.00/)){ str = '0';}
+    var pvalue = parseFloat(str);
     var score =  parseFloat(e.find('td.score').html());
+
     if (pvalue < 0.05){
       if (score > 0){
         up = up + 1;
