@@ -83,9 +83,9 @@
                 - else
                   %td.pvalue= print_pvalue info[:pvalue]
                 %td.select
-                  %label{:for => "#{i}_up"} &uarr;
+                  &uarr;
                   %input.compare_select{:type => 'checkbox', :name => experiment, :id=> "#{i}_up" }
-                  %label{:for => "#{i}_down"} &nbsp;&nbsp;&darr;
+                  &nbsp;&nbsp;&darr;
                   %input.compare_invert{:type => 'checkbox', :name => experiment, :id=> "#{i}_down"}
             - else
               - gds, condition, name = Info::parse_experiment(experiment).values_at(:gds, :condition, :name) 
@@ -105,9 +105,9 @@
                 - else
                   %td.pvalue= "%1.3g" % info[:pvalue]
                 %td.select
-                  %label{:for => "#{i}_up"} &uarr;
+                  &uarr;
                   %input.compare_select{:type => 'checkbox', :name => experiment, :id=> "#{i}_up" }
-                  %label{:for => "#{i}_down"} &nbsp;&nbsp;&darr;
+                  &nbsp;&nbsp;&darr;
                   %input.compare_invert{:type => 'checkbox', :name => experiment, :id=> "#{i}_down"}
     %a#reset.button{:href =>"#", :onclick => "reset_checkboxes()"} Reset 
 
