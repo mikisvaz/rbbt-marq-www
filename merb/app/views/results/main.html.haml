@@ -69,13 +69,13 @@
                 %td.experiment
                   %a.toggle{:href =>"#"} [+]
                   %span.gds
-                    %span.title= span_words(title)
+                    %span.title{ 'data-span_words' => span_words(title)}= title
                     -if gds =~ /GSE/
                       %a.dataset{:href =>"http://www.ncbi.nlm.nih.gov/projects/geo/query/acc.cgi?acc=#{gds}",:target => "_blank"} [GEO]
                     -else
                       %a.dataset{:href =>"http://www.ncbi.nlm.nih.gov/sites/GDSbrowser?acc=#{gds}",:target => "_blank"} [GEO]
-                  %span.test
-                    = span_words(name)
+                  %span.test{ 'data-span_words' => span_words(name)}
+                    = name
                     %span.condition== (#{ condition })
                 %td.score= "%1.3g" % info[:score] 
                 - if info[:pvalue] <= 0.05
@@ -94,10 +94,10 @@
                 %td.experiment
                   %a.toggle{:href =>"#"} [+]
                   %span.gds
-                    %span.title= span_words(title)
+                    %span.title{ 'data-span_words' => span_words(title)}= title
                     == (#{gds}) 
-                  %span.test  
-                    = span_words(name)
+                  %span.test{ 'data-span_words' => span_words(name)}
+                    = name
                     %span.condition== (#{ condition })
                 %td.score= "%1.3g" % info[:score] 
                 - if info[:pvalue] <= 0.05

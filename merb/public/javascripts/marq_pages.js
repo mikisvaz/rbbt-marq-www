@@ -125,9 +125,17 @@ function update_annotations(cell){
     // Words are treated different, put triggers in the actual text
     else{
       var terms = annotations[type][experiment];      
+
+      var title = cell.find('span.title');
+      title.html(title.attr('data-span_words'));
+
+      var test = cell.find('span.test');
+      var condition = test.find('span.condition');
+      test.html(test.attr('data-span_words')).append(condition);
+
       cell.find('span.word').each(function(){
         var span = $(this);
-        if (jQuery.inArray($(span).attr('data-stem'),terms) >= 0){
+        if (jQuery.inArray(span.attr('data-stem'), terms) >= 0){
           span.click(click_word).addClass('click');
         }
       })
