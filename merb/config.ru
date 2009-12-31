@@ -6,12 +6,11 @@ ENV['GEM_PATH'] ||= ENV['GEM_HOME']
 
 Gem.use_paths(ENV['GEM_HOME'], ENV['GEM_PATH'].split(':') )
 require 'rubygems'
-require 'rubygems'
+gem 'soap4r'
 
 require 'rbbt'
 require 'rbbt/bow/dictionary'
 
-rootdir = File.dirname(__FILE__)
 
 require 'MARQ'
 
@@ -29,7 +28,9 @@ def init_WS
   end
 
   pid = fork do
-      $:.unshift(rootdir, 'webservice')
+      require 'simplews'
+      rootdir = File.dirname(File.dirname(File.expand_path(__FILE__)))
+      $:.unshift(File.join(rootdir, 'webservice'))
       require 'MARQWS'
      
   
@@ -40,8 +41,8 @@ def init_WS
       puts "Starting Server in #{ host }:#{ port }"
       server = MARQWS.new("MARQ", "MARQ Web Server",host, port, MARQ.workdir)
   
-      FileUtils.mkdir_p File.join(MARQ.rootdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.rootdir, '/webservice/wsdl/')
-      Open.write(File.join(MARQ.rootdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
+      FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.workdir, '/webservice/wsdl/')
+      Open.write(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
   
       trap('INT') { server.shutdown }
       server.start
