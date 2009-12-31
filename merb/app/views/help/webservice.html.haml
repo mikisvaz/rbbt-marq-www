@@ -9,8 +9,29 @@
     
     h1. Web Server Access
 
-    The core funtionalities in MARQ can be accessed through a web server interface. This is the
-    "WSDL file":/MARQWS.wsdl
+    The core functionalities in MARQ can be accessed through a web server interface. This is the
+    "WSDL file":/MARQWS.wsdl that describes the web server. The web server offers the analysis
+    functionalities asynchronously; an analysis job is issued and its status is queried until
+    its finished and, if no error has arisen, the results can be gathered gathered. There are two
+    possible analysis, platform based and organism based. In the platform based analysis a platform
+    name must be use, you can check "GEO":http://www.ncbi.nlm.nih.gov/geo/ to find out the code
+    of the platform to use, such as 'GPL570' for "Affymetrix Human Genome U133 Plus 2.0 Array" arrays.
+    The gene lists must be specified using probe ids from the platform. The organism based analysis
+    uses all available platforms for a given organism by translating all probe ids from all platforms
+    into a common representation. The query list of genes may be specified using almost any identifier
+    format, from gene symbols, to entrez genes or any platform probe ids, since they will also be translated
+    into the common format.  The analysis results of a job can be mined for patterns in the
+    meta-information of the signatures. This is done using the @annotations@ service, where a job
+    id, and a type of annotation must be specified. The results are the significant terms with
+    an associated p-value.
+
+    Additionally, the web service provides methods to retrieve log-ratios and t-values for any specific
+    signature that can be used for meta-analysis functions. The MARQ web portal uses this functionality
+    to retrieve the t-values to perform Rank Product meta-analysis.
+
+    For more information on how to access the server consult the WSDL documentation and the
+    "SimlpeWS":http://rbbt.dacya.ucm.es/simplews/index.html information on asynchronous jobs.
+
 
    
  
