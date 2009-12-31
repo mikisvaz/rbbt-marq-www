@@ -19,4 +19,10 @@ class Help < Application
     end
   end
 
+  def webservice
+    cache("webservice") do
+      render
+    end
+  end
+
 end
