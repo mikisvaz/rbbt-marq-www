@@ -1,17 +1,17 @@
 require 'fileutils'
 
-ENV['GEM_HOME']="/home/marq/.ruby/gems/"
-ENV['GEM_PATH']="/home/marq/.ruby/gems/:/var/lib/gems/1.8/"
+
+ENV['GEM_HOME'] ||= "#{ENV['HOME']}/.gem"
+ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+
+Gem.use_paths(ENV['GEM_HOME'], ENV['GEM_PATH'].split(':') )
 require 'rubygems'
 require 'rubygems'
 
-ENV['RBBT_HOME'] = '/home/marq/git/rbbt/'
-$:.unshift(File.join(ENV['RBBT_HOME'], 'lib'))
+require 'rbbt'
 require 'rbbt/bow/dictionary'
 
-ENV['MARQ_HOME'] = '/home/marq/git/MARQ/'
-$:.unshift(File.join(ENV['MARQ_HOME'], 'lib'))
-$:.unshift(File.join(ENV['MARQ_HOME'], 'merb'))
+rootdir = File.dirname(__FILE__)
 
 require 'MARQ'
 
@@ -29,7 +29,7 @@ def init_WS
   end
 
   pid = fork do
-      FileUtils.cd File.join(MARQ.rootdir, 'webservice')
+      $:.unshift(rootdir, 'webservice')
       require 'MARQWS'
      
   
@@ -53,7 +53,7 @@ end
 require 'soap/wsdlDriver'
 begin
     
-    SOAP::WSDLDriverFactory.new(File.join(MARQ.rootdir, '/webservice/wsdl/MARQWS.wsdl')).create_rpc_driver.wsdl != ""
+    SOAP::WSDLDriverFactory.new(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl')).create_rpc_driver.wsdl != ""
 rescue
     puts $!.inspect
     init_WS

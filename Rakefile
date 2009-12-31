@@ -28,6 +28,7 @@ begin
     gem.add_dependency('RedCloth')
     gem.add_dependency('rand')
     gem.add_dependency('zaml')
+    gem.add_dependency('compass')
 
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
