@@ -9,22 +9,22 @@
     
     h1. Web Server Access
 
-    The core functionalities in MARQ can be accessed through a web server interface. This is the
-    "WSDL file":/MARQWS.wsdl that describes the web server. The web server offers the analysis
-    functionalities asynchronously; an analysis job is issued and its status is queried until
-    its finished and, if no error has arisen, the results can be gathered. There are two
-    possible analysis, platform based and organism based. In the platform based analysis a platform
-    name must be use, you can check "GEO":http://www.ncbi.nlm.nih.gov/geo/ to find out the code
-    of the platform to use, such as 'GPL570' for "Affymetrix Human Genome U133 Plus 2.0 Array" arrays.
-
-    The gene lists must be specified using probe ids from the platform. The organism based analysis
-    uses all available platforms for a given organism by translating all probe ids from all platforms
-    into a common representation. The query list of genes may be specified using almost any identifier
-    format, from gene symbols, to entrez genes or any platform probe ids, since they will also be translated
-    into the common format. The analysis results of a job can be mined for patterns in the
-    meta-information of the signatures. This is done using the @annotations@ service, where a job
-    id, and a type of annotation must be specified. The results are the significant terms with
-    an associated p-value.
+    The core functionalities in MARQ can be accessed through a web server interface. This is the "WSDL
+    file":/MARQWS.wsdl that describes the web server. The web server offers the analysis functionalities asynchronously;
+    an analysis job is issued, its status is queried until its finished and, if no error has arisen, the results can be
+    gathered. There are two possible analysis, platform based and organism based. 
+    
+    In the platform based analysis a platform identifier must be specified, you can check
+    "GEO":http://www.ncbi.nlm.nih.gov/geo/ to find out the identifier of the platform to use, such as 'GPL570' for "Affymetrix
+    Human Genome U133 Plus 2.0 Array" arrays. The gene lists must be specified using probe ids from the platform. The
+    organism based analysis uses all available platforms for a given organism by translating all probe ids from all
+    platforms into a common representation. The query list of genes may be specified using almost any identifier format
+    from gene symbols, to entrez genes or any platform probe ids, since they will also be translated into the common
+    format. 
+    
+    The analysis results of a job can be mined for patterns in the meta-information of the signatures. This is done
+    using the @annotations@ service, where a job id, and a type of annotation must be specified. The results are the
+    significant terms with their associated p-value.
 
     Additionally, the web service provides methods to retrieve log-ratios and t-values for any specific
     signature that can be used for meta-analysis functions. The MARQ web portal uses this functionality
@@ -34,15 +34,13 @@
 
     This table shows a list of methods available in the MARQ web service. Most of them are related
     to job management. Only @match_organism@, @match_platform@, and @annotations@ are analysis jobs. The
-    methods @ts@ and @logratios@ are data gathering methods.
+    methods @ts@ and @logratios@ are synchronous data gathering methods.
 
     #{File.open(File.join(MARQ.workdir,'webservice/html_doc/documentation.html')).read}
 
-    The following script is a client for the MARQ web service written in Ruby "MARQWS_client.rb":/examples/MARQWS_client.rb.
+    The following script is a client for the MARQ web service written in Ruby, "MARQWS_client.rb":/examples/MARQWS_client.rb.
     
     For more information on how to access the server consult the WSDL documentation and the
     "SimlpeWS":http://rbbt.dacya.ucm.es/simplews/index.html information on asynchronous jobs.
 
-
-   
  
