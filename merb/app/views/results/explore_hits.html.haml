@@ -36,7 +36,7 @@
                 - else
                   = name
                 - if @gds
-                  %a.button.profile{:href => "http://www.ncbi.nlm.nih.gov/sites/entrez?db=geo&term=#{@gds}[ACCN]+(#{@translations[p[0][1]].join("OR ")})", :blank => "_target"} GDS
+                  %a.button.profile{:href => "http://www.ncbi.nlm.nih.gov/sites/entrez?db=geo&term=#{@gds}[ACCN]+(#{@translations[p[0][1]].join(" OR ")})", :blank => "_target"} GDS
               %td.synonyms=@synonyms[p[0][1]].uniq.join(", ")
               %td.hit=p[1]
 
