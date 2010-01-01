@@ -30,16 +30,17 @@ def init_WS
   pid = fork do
       require 'simplews'
       rootdir = File.dirname(File.dirname(File.expand_path(__FILE__)))
+      workdir = File.join(MARQ.workdir, 'webservice', 'jobs')
       $:.unshift(File.join(rootdir, 'webservice'))
       require 'MARQWS'
      
-  
       puts "Starting WS"
       host = `hostname`.chomp.strip + '.' +  `hostname -d`.chomp.strip
       port = '8282'
   
       puts "Starting Server in #{ host }:#{ port }"
-      server = MARQWS.new("MARQ", "MARQ Web Server",host, port, MARQ.workdir)
+
+      server = MARQWS.new("MARQ", "MARQ Web Server",host, port, workdir)
   
       FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.workdir, '/webservice/wsdl/')
       Open.write(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
