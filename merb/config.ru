@@ -43,6 +43,9 @@ def init_WS
   
       FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.workdir, '/webservice/wsdl/')
       Open.write(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
+
+      FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/html_doc/') unless File.exist? File.join(MARQ.workdir, '/webservice/html_doc/')
+      Open.write(File.join(MARQ.workdir, '/webservice/html_doc/MARQWS.html'), server.documentation)
   
       trap('INT') { server.shutdown }
       server.start

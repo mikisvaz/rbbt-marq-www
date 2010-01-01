@@ -453,7 +453,7 @@ a#close_annotations_menu
 
 ///* HELP PAGE */
 !help_width = 700px
-#help, #methods, #supplementary, #quick
+#help, #methods, #supplementary, #quick, #webservice
   :width= !help_width
   :margin auto
   p
@@ -486,6 +486,24 @@ a#close_annotations_menu
     &.plot
       :height 100%
       :margin auto
+#webservice
+  table
+    th,td
+      :padding 3px
+    td.WS_operation
+      :color= !color_highlight
+      :font-weight bold
+      :font-size 1.2em
+  dt
+    :font-weight bold
+  dd 
+    :color= !light_font_color
+    :margin-bottom 2px
+  .WS_task, .WS_normal
+    td.WS_operation
+      :color black
+
+
 /* GENERAL STYLES */
 table
   :table-layout fixed
