@@ -68,7 +68,7 @@ class Main < Application
   end
 
   def wsdl
-    headers["Content-Type"] =  'text/xml'
+    headers["Content-Type"] =  'application/xml'
     headers["Content-Disposition"] =  'attachment; filename=MARQWS.wsdl'
     File.open(File.join(MARQ.workdir, 'webservice', 'wsdl', 'MARQWS.wsdl')) {|f| f.read }
   end
