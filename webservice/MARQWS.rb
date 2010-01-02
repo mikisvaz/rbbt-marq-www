@@ -149,7 +149,7 @@ class MARQWS < SimpleWS::Jobs
   desc "Retrieve t-values for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
         for cross-platform."
   param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
-             :comparison => "Signature from the dataset (eg. cancer <=> control)",
+             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
              :genes   => "Subset of genes to retrieve. If empty retrieves all",
              :return => "Tab separated file, firts column are gene ids, second column are the values"
   serve :ts, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
