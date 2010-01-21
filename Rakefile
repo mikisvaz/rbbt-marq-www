@@ -18,8 +18,8 @@ begin
     gem.files.exclude 'merb/public/results'
     gem.files.exclude 'merb/public/data'
 
-    gem.add_dependency('MARQ')
     gem.add_dependency('rbbt')
+    gem.add_dependency('rbbt-marq')
 
     gem.add_dependency('merb')
     gem.add_dependency('simplews')
@@ -27,6 +27,8 @@ begin
     gem.add_dependency('spreadsheet')
     gem.add_dependency('RedCloth')
     gem.add_dependency('rand')
+    gem.add_dependency('zaml')
+    gem.add_dependency('compass')
 
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings

@@ -2,6 +2,8 @@
  
 # Specify a specific version of a dependency
 # dependency "RedCloth", "> 3.0"
+#
+require 'config/dependencies.rb'
 
 #  use_orm :none
 use_test :rspec

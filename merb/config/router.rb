@@ -37,6 +37,7 @@ Merb::Router.prepare do
   #default_routes
   
   # Change this for your home page to be available at /
+  match('/MARQWS.wsdl').to(:controller => 'main', :action => 'wsdl')
   match('/images/:image').to(:controller => 'results', :action => 'images')
   match('/logratios').to(:controller => 'results', :action => 'logratios')
   match('/ts').to(:controller => 'results', :action => 'ts')
@@ -55,6 +56,7 @@ Merb::Router.prepare do
   match('/help/').to(:controller => 'help', :action => 'index')
   match('/help/methods').to(:controller => 'help', :action => 'meth')
   match('/help/quick').to(:controller => 'help', :action => 'quick')
+  match('/help/webservice').to(:controller => 'help', :action => 'webservice')
 
   match('/:job').to(:controller => 'results', :action => 'main')
   match('/', :method => :post).to(:controller => 'main', :action =>'post')

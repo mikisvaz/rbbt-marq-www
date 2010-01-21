@@ -51,6 +51,10 @@ class MARQWS < SimpleWS::Jobs
   end
 
  
+  desc "Mine annotation patterns in analysis results"
+  param_desc :job => "Job identifier of the analysis", 
+    :type => "Annotation type: words, GO_up, GO_down, GOSlim_up, GOSlim_down",
+    :return => "Gzip YAML file containing a hash with the information"
   task :annotations, %w(job type), {:job => :string, :type => :string}, ["annotations/{JOB}.yaml", "annotations/{JOB}_enriched.yaml"] do  |job, type|
     step(:scores, "Loading Scores")
     scores = YAML::load(gunzip(File.join(workdir, "scores/#{job}.yaml.gz")))
@@ -64,6 +68,11 @@ class MARQWS < SimpleWS::Jobs
     write("annotations/#{job_name}_enriched.yaml", gzip(ZAML.dump(terms)))
   end
 
+  desc "Sort platform signatures by query"
+  param_desc :platform => "Platform identifiers (eg. GPL570)", 
+    :up => "List of up regulated platform probe ids",
+    :down => "List of down regulated platform probe ids",
+    :return => "Gzip YAML file containing a hash with the information"
   task :match_platform, %w(platform up down), {:platform => :string, :up => :array, :down => :array},
     ['scores/{JOB}.yaml.gz' ] do |platform, up, down|
 
@@ -86,6 +95,11 @@ class MARQWS < SimpleWS::Jobs
     write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
   end
 
+  desc "Sort organism signatures by query"
+  param_desc :organism => "Organism identifier: sgd, human, rgd, mgi, tair", 
+    :up => "List of up regulated gene ids. Accepts several formats",
+    :down => "List of down regulated gene ids. Accepts several formats",
+    :return => "Gzip YAML file containing a hash with the information"
   task :match_organism, %w(organism up down), {:organism => :string, :up => :array, :down => :array},
     ['scores/{JOB}.yaml.gz'] do |organism, up, down|
     require 'MARQ/ID'
@@ -123,6 +137,22 @@ class MARQWS < SimpleWS::Jobs
     write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
   end
 
+  desc "Retrieve log-ratios for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+        for cross-platform."
+  param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
+             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
+             :genes   => "Subset of genes to retrieve. If empty retrieves all",
+             :return => "Tab separated file, firts column are gene ids, second column are the values"
+  serve :logratios, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
+
+
+  desc "Retrieve t-values for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+        for cross-platform."
+  param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
+             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
+             :genes   => "Subset of genes to retrieve. If empty retrieves all",
+             :return => "Tab separated file, firts column are gene ids, second column are the values"
+  serve :ts, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
   
   
   class Scheduler::Job
@@ -137,8 +167,6 @@ class MARQWS < SimpleWS::Jobs
     super(*args)
     @soaplet.allow_content_encoding_gzip = true
 
-    serve :logratios, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
-    serve :ts, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
     FileUtils.mkdir(File.join(workdir, 'scores')) unless File.exist?(File.join(workdir, 'scores'))
     FileUtils.mkdir(File.join(workdir, 'annotations')) unless File.exist?(File.join(workdir, 'annotations'))
   end
@@ -156,7 +184,10 @@ if __FILE__ == $0
   server = MARQWS.new("MARQ", "MARQ Web Server",host, port, File.join(MARQ.workdir,'webservice', 'jobs'))
 
   FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice', 'wsdl/') unless File.exist? File.join(MARQ.workdir, '/webservice', 'wsdl/')
-  File.open(File.join(MARQ.workdir, '/webservice', 'wsdl', 'MARQWS.wsdl'),'w'){|file| file.write server.wsdl}
+  server.wsdl(File.join(MARQ.workdir, '/webservice', 'wsdl', 'MARQWS.wsdl'))
+
+  FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice', 'html_doc/') unless File.exist? File.join(MARQ.workdir, '/webservice', 'html_doc/')
+  server.documentation(File.join(MARQ.workdir, '/webservice', 'html_doc', 'documentation.html'))
 
   trap('INT') { server.shutdown }
   server.start

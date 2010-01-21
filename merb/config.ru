@@ -1,17 +1,16 @@
 require 'fileutils'
 
-ENV['GEM_HOME']="/home/marq/.ruby/gems/"
-ENV['GEM_PATH']="/home/marq/.ruby/gems/:/var/lib/gems/1.8/"
-require 'rubygems'
-require 'rubygems'
 
-ENV['RBBT_HOME'] = '/home/marq/git/rbbt/'
-$:.unshift(File.join(ENV['RBBT_HOME'], 'lib'))
+ENV['GEM_HOME'] ||= "#{ENV['HOME']}/.gem"
+ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+
+Gem.use_paths(ENV['GEM_HOME'], ENV['GEM_PATH'].split(':') )
+require 'rubygems'
+gem 'soap4r'
+
+require 'rbbt'
 require 'rbbt/bow/dictionary'
 
-ENV['MARQ_HOME'] = '/home/marq/git/MARQ/'
-$:.unshift(File.join(ENV['MARQ_HOME'], 'lib'))
-$:.unshift(File.join(ENV['MARQ_HOME'], 'merb'))
 
 require 'MARQ'
 
@@ -29,19 +28,25 @@ def init_WS
   end
 
   pid = fork do
-      FileUtils.cd File.join(MARQ.rootdir, 'webservice')
+      require 'simplews'
+      rootdir = File.dirname(File.dirname(File.expand_path(__FILE__)))
+      workdir = File.join(MARQ.workdir, 'webservice', 'jobs')
+      $:.unshift(File.join(rootdir, 'webservice'))
       require 'MARQWS'
      
-  
       puts "Starting WS"
       host = `hostname`.chomp.strip + '.' +  `hostname -d`.chomp.strip
       port = '8282'
   
       puts "Starting Server in #{ host }:#{ port }"
-      server = MARQWS.new("MARQ", "MARQ Web Server",host, port, MARQ.workdir)
+
+      server = MARQWS.new("MARQ", "MARQ Web Server",host, port, workdir)
   
-      FileUtils.mkdir_p File.join(MARQ.rootdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.rootdir, '/webservice/wsdl/')
-      Open.write(File.join(MARQ.rootdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
+      FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/wsdl/') unless File.exist? File.join(MARQ.workdir, '/webservice/wsdl/')
+      Open.write(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl'), server.wsdl)
+
+      FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/html_doc/') unless File.exist? File.join(MARQ.workdir, '/webservice/html_doc/')
+      Open.write(File.join(MARQ.workdir, '/webservice/html_doc/documentation.html'), server.documentation)
   
       trap('INT') { server.shutdown }
       server.start
@@ -53,7 +58,7 @@ end
 require 'soap/wsdlDriver'
 begin
     
-    SOAP::WSDLDriverFactory.new(File.join(MARQ.rootdir, '/webservice/wsdl/MARQWS.wsdl')).create_rpc_driver.wsdl != ""
+    SOAP::WSDLDriverFactory.new(File.join(MARQ.workdir, '/webservice/wsdl/MARQWS.wsdl')).create_rpc_driver.wsdl != ""
 rescue
     puts $!.inspect
     init_WS

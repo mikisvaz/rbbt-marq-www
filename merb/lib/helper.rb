@@ -254,13 +254,6 @@ module WS
       results = results(job)
       FDR.adjust_hash!(results,:pvalue)
 
-      #max = min = 0
-      #results = results.collect{|experiment, info|
-      #  max = info[:score] if info[:score] > max
-      #  min = info[:score] if info[:score] < min
-      #  [experiment, info]
-      #}
-
       pos  = [] 
       neg  = []
       null = []
