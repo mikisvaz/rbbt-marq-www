@@ -1,10 +1,12 @@
 require 'MARQ'
+require 'MARQ/main'
+require 'MARQ/fdr'
+require 'MARQ/GEO'
 require 'soap/wsdlDriver'
 require 'yaml'
 require 'zlib'
 require 'stringio'
 require 'base64'
-require 'MARQ/fdr'
 require 'json'
 
 require 'iconv' 
@@ -367,32 +369,11 @@ end
 module Info
 
   @@gpl = {}
-  Dir.glob(File.join(MARQ.datadir,'GEO') + '/GPL*/*/*.values').each{|f|
-    gpl, gds = f.match(/(GPL\d+).*(G.*)\.values/).values_at(1,2)
-    @@gpl[gds] = gpl
-  }
+  GEO::platforms.each { |platform| @@gpl[platform] = MARQ::Platform.datasets(platform) }
 
-  @@gds_info = {}
-  def self.GDS_info(gds)
-    if @@gds_info[gds].nil?
-      info = GEO::GDS_info(gds)
-      info[:gpl] = @@gpl[gds]
-      @@gds_info[gds] = info
-    end
-    @@gds_info[gds]
-  end
-
-  @@customds_info = {}
-  def self.CustomDS_info(dataset)
-    @@customds_info[dataset] ||= CustomDS::info(dataset)
-  end
-
+  @@info = {}
   def self.info(dataset)
-    if MARQ.platform_type(dataset) == :GEO
-      GDS_info(dataset)
-    else
-      CustomDS_info(dataset)
-    end
+    @@info[dataset] ||= MARQ::Dataset.info(dataset)
   end
 
 

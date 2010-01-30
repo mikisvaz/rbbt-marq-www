@@ -11,6 +11,7 @@ use_template_engine :haml
 
 dependency "merb-assets"  
  
+require 'rubygems'
 require 'MARQ'
 require 'compass'
 require 'fileutils'

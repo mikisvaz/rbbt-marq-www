@@ -9,7 +9,7 @@ class Main < Application
         [  
           org, 
           Organism.name(org), 
-          MARQ.organism_platforms(org).sort{|a,b| 
+          MARQ::Platform.organism_platforms(org).sort{|a,b| 
             a.sub(/GPL/,'').to_i <=> b.sub(/GPL/,'').to_i
           }
         ]

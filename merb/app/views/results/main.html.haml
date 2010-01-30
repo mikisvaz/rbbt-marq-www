@@ -63,7 +63,7 @@
 
             - if experiment =~ /^GDS|GSE/
               - gds, condition, name = Info::parse_experiment(experiment).values_at(:gds, :condition, :name) 
-              - title, description = Info::GDS_info(gds).values_at(:title, :description)
+              - title, description = Info::info(gds).values_at(:title, :description)
 
               %tr{:id => experiment}
                 %td.experiment
@@ -89,7 +89,7 @@
                   %input.compare_invert{:type => 'checkbox', :name => experiment, :id=> "#{i}_down"}
             - else
               - gds, condition, name = Info::parse_experiment(experiment).values_at(:gds, :condition, :name) 
-              - title, description, gpl = Info::CustomDS_info(gds).values_at(:title, :description, :gpl)
+              - title, description, gpl = Info::info(gds).values_at(:title, :description, :gpl)
               %tr{:id => experiment}
                 %td.experiment
                   %a.toggle{:href =>"#"} [+]
