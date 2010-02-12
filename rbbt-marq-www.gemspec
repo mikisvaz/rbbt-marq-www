@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rbbt-marq-www}
-  s.version = "1.1.0"
+  s.version = "1.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Miguel Vazquez"]
-  s.date = %q{2010-01-30}
+  s.date = %q{2010-02-12}
   s.description = %q{This package contains a SOAP web server and a merb application.}
   s.email = %q{miguel.vazquez@fdi.ucm.es}
   s.extra_rdoc_files = [
