@@ -64,7 +64,7 @@ class Results < Application
 
   def images
     image = params[:image]
-    Open.read(File.join(MARQ.workdir, 'merb', 'tmp', 'images',image))
+    Open.read(File.join(MARQ.workdir, 'merb', 'tmp', 'images', image))
   end
  
   def ajax_experiment

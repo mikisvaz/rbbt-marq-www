@@ -29,7 +29,90 @@ class MARQWS < SimpleWS::Jobs
     end
   end
 
-  # {{{ Data retrieval
+  # {{{ Platform Query
+
+  desc "Sort platform signatures by query"
+  param_desc :platform => "Platform identifiers (eg. GPL570)", 
+    :up => "List of up regulated platform probe ids",
+    :down => "List of down regulated platform probe ids",
+    :return => "Gzip YAML file containing a hash with the information"
+  task :match_platform, %w(platform up down), {:platform => :string, :up => :array, :down => :array},
+    ['scores/{JOB}.yaml.gz' ] do |platform, up, down|
+
+    info :platform => platform
+    info :organism => MARQ::Platform.organism(platform)
+
+    up = up.collect{|gene| gene.strip if gene}
+    down = down.collect{|gene| gene.strip if gene}
+
+    info(:up => up, :down => down)
+
+    raise ArgumentError, "No genes identified" if up.empty? && down.empty?
+
+    step(:matching, "Matching genes to platform #{ platform }, up: #{up.length}, down:  #{down.length}")
+    scores = MARQ::RankQuery.platform_scores(platform, up, down)
+
+    if scores.keys.empty?  
+     raise ArgumentError, "No genes matched in platform \
+      #{ platform }, check that they are in the right format, automatic \
+      transalation is not performed in platform specific queries" 
+    end
+
+    step(:saving, "Saving results")
+    write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
+  end
+
+
+  # {{{ Organism Query
+
+  desc "Sort organism signatures by query"
+  param_desc :organism => "Organism identifier: sgd, human, rgd, mgi, tair", 
+    :up => "List of up regulated gene ids. Accepts several formats",
+    :down => "List of down regulated gene ids. Accepts several formats",
+    :return => "Gzip YAML file containing a hash with the information"
+  task :match_organism, %w(organism up down), {:organism => :string, :up => :array, :down => :array},
+    ['scores/{JOB}.yaml.gz'] do |organism, up, down|
+    require 'MARQ/ID'
+
+    info :organism => organism
+
+    up = up.collect{|gene| gene.strip if gene}
+    down = down.collect{|gene| gene.strip if gene}
+    
+    info(:up => up, :down => down)
+
+    step(:translating, "Translating genes")
+
+    cross_platform_up = ID.translate(organism, up)
+    cross_platform_down = ID.translate(organism, down)
+
+    info(
+         :cross_platform_up   => cross_platform_up.collect   {|n| n || "NO MATCH"},
+         :cross_platform_down => cross_platform_down.collect {|n| n || "NO MATCH"}
+    )
+
+    cross_platform_up   = cross_platform_up.compact
+    cross_platform_down = cross_platform_down.compact
+    
+    raise ArgumentError, "No genes identified" if cross_platform_up.empty? && cross_platform_down.empty?
+
+    step(:matching, "Matching genes to organism #{ organism }, up: #{cross_platform_up.length}, down:  #{cross_platform_down.length}")
+    
+    platforms = MARQ::Platform.organism_platforms(organism).
+      select  {|platform| MARQ::Platform.has_cross_platform? platform }.
+      collect {|platform| MARQ::Name.cross_platform platform }
+
+
+    scores = {}
+    platforms.each_with_index{|platform, i|
+      step(:processing, "Generating Scores for platform #{ platform } #{ i + 1 }/#{platforms.length}.")
+      scores = scores.merge(MARQ::RankQuery.platform_scores(platform, cross_platform_up, cross_platform_down))
+    }
+    step(:saving, "Saving results")
+    write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
+  end
+
+   # {{{ Data retrieval
 
   def logratios(dataset, comparison, genes)
     path = MARQ::Dataset.path(dataset)
@@ -40,6 +123,15 @@ class MARQWS < SimpleWS::Jobs
 
     `paste #{path + '.codes'} #{path + '.logratios'}| grep '#{genes.collect{|gene| "^#{ gene }[[:space:]]"}.join('\|')}'|cut -f1,#{position + 2}`
   end
+
+  desc "Retrieve log-ratios for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+        for cross-platform."
+  param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
+             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
+             :genes   => "Subset of genes to retrieve. If empty retrieves all",
+             :return => "Tab separated file, firts column are gene ids, second column are the values"
+  serve :logratios, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
+
 
   def ts(dataset, comparison, genes)
     path = MARQ.dataset_path(dataset)
@@ -53,15 +145,6 @@ class MARQWS < SimpleWS::Jobs
 
     `paste #{path + '.codes'} #{path + '.t'}| grep '#{genes.collect{|gene| "^#{ gene }[[:space:]]"}.join('\|')}'|cut -f1,#{position + 2}`
   end
-
-  desc "Retrieve log-ratios for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
-        for cross-platform."
-  param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
-             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
-             :genes   => "Subset of genes to retrieve. If empty retrieves all",
-             :return => "Tab separated file, firts column are gene ids, second column are the values"
-  serve :logratios, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
-
 
   desc "Retrieve t-values for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
         for cross-platform."
@@ -91,85 +174,7 @@ class MARQWS < SimpleWS::Jobs
     write("annotations/#{job_name}_enriched.yaml", gzip(ZAML.dump(terms)))
   end
 
-  # {{{ Platform Query
 
-  desc "Sort platform signatures by query"
-  param_desc :platform => "Platform identifiers (eg. GPL570)", 
-    :up => "List of up regulated platform probe ids",
-    :down => "List of down regulated platform probe ids",
-    :return => "Gzip YAML file containing a hash with the information"
-  task :match_platform, %w(platform up down), {:platform => :string, :up => :array, :down => :array},
-    ['scores/{JOB}.yaml.gz' ] do |platform, up, down|
-
-    up = up.collect{|gene| gene.strip if gene}
-    down = down.collect{|gene| gene.strip if gene}
-
-    info(:platform => platform,
-         :organism => MARQ::Platform.organism(platform),
-         :up => up,
-         :down => down
-        )
-
-    raise ArgumentError, "No genes identified" if up.empty? && down.empty?
-    step(:matching, "Matching genes to platform #{ platform }, up: #{up.length}, down:  #{down.length}")
-    scores = MARQ::RankQuery.platform_scores(platform, up, down)
-
-    if scores.keys.empty?  
-     raise ArgumentError, "No genes matched in platform \
-      #{ platform }, check that they are in the right format, automatic \
-      transalation is not performed in platform specific queries" 
-    end
-
-    step(:saving, "Saving results")
-    write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
-  end
-
-  # {{{ Organism Query
-  desc "Sort organism signatures by query"
-  param_desc :organism => "Organism identifier: sgd, human, rgd, mgi, tair", 
-    :up => "List of up regulated gene ids. Accepts several formats",
-    :down => "List of down regulated gene ids. Accepts several formats",
-    :return => "Gzip YAML file containing a hash with the information"
-  task :match_organism, %w(organism up down), {:organism => :string, :up => :array, :down => :array},
-    ['scores/{JOB}.yaml.gz'] do |organism, up, down|
-    require 'MARQ/ID'
-
-    up = up.collect{|gene| gene.strip if gene}
-    down = down.collect{|gene| gene.strip if gene}
-
-    step(:translating, "Translating genes")
-
-    cross_platform_up = ID.translate(organism, up)
-    cross_platform_down = ID.translate(organism, down)
-
-    info(:organism => organism,
-         :up => up,
-         :down => down,
-         :cross_platform_up => cross_platform_up.collect{|n| n || "NO MATCH"},
-         :cross_platform_down => cross_platform_down.collect{|n| n || "NO MATCH"})
-
-    cross_platform_up = cross_platform_up.compact
-    cross_platform_down = cross_platform_down.compact
-    
-    raise ArgumentError, "No genes identified" if cross_platform_up.empty? && cross_platform_down.empty?
-
-    step(:matching, "Matching genes to organism #{ organism }, up: #{cross_platform_up.length}, down:  #{cross_platform_down.length}")
-    
-    platforms = MARQ::Platform.organism_platforms(organism).
-      select  {|platform| MARQ::Platform.has_cross_platform? platform }.
-      collect {|platform| platform + "_cross_platform" }
-
-    scores = {}
-    step(:processing, "Procesing #{platforms.length} datasets")
-    platforms.each_with_index{|platform, i |
-      step(:processing, "Generating Scores for platform #{ platform } #{ i + 1 }/#{platforms.length}.")
-      scores = scores.merge(MARQ::RankQuery.platform_scores(platform, cross_platform_up, cross_platform_down))
-    }
-    step(:saving, "Saving results")
-    write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
-  end
-
- 
   
   class Scheduler::Job
     alias_method :old_step, :step
