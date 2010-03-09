@@ -38,11 +38,11 @@ module Merb
       end
     end
 
-    def print_pvalue(pvalue, min = 0.001)
+    def print_pvalue(pvalue, min = 0.0001)
       if pvalue == 0
         "< #{min}"
       else
-        "%1.3g" % pvalue
+        "%1.4g" % pvalue
       end
     end
   end
