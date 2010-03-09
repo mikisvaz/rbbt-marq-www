@@ -5,20 +5,22 @@ class Series < Application
     @series = params[:series]
 
     if @series
-      @series_info = GEO::GSE_info(@series)
+      @series_info = GEO::SOFT.GSE(@series)
       @sample_info = {}
-      @gds = GEO::Eutils::GSE_dataset? @series
+      @gds = GEO::Remote::series_dataset? @series
       @series_info[:samples].each{|gsm|
-        @sample_info[gsm] = GEO::GSM_info(gsm)
+        @sample_info[gsm] = GEO::SOFT.GSM(gsm)
       }
       if params[:conditions]
         info = {}
-        info[:platform] = @series_info[:platform]
-        info[:title] = @series_info[:title]
+        info[:platform]    = @series_info[:platform]
+        info[:title]       = @series_info[:title]
         info[:description] = @series_info[:description]
-        info[:arrays] = {}
+        info[:arrays]      = {}
+
         conditions = params[:conditions].split("|")
-        values = params[:values].split("|")
+        values     = params[:values].split("|")
+
         @series_info[:samples].each{|sample|
           ph = {}
           conditions.each{|c|

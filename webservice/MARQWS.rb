@@ -6,6 +6,7 @@ require 'MARQ/annotations'
 require 'simplews/jobs'
 require 'zlib'
 require 'zaml'
+require 'progress-monitor'
 
 class MARQWS < SimpleWS::Jobs
   class ArgumentError < Exception; end
@@ -51,6 +52,7 @@ class MARQWS < SimpleWS::Jobs
 
     step(:matching, "Matching genes to platform #{ platform }, up: #{up.length}, down:  #{down.length}")
     scores = MARQ::RankQuery.platform_scores(platform, up, down)
+    scores = MARQ::RankQuery.add_pvalues(scores, up.length, down.length)
 
     if scores.keys.empty?  
      raise ArgumentError, "No genes matched in platform \
@@ -98,16 +100,12 @@ class MARQWS < SimpleWS::Jobs
 
     step(:matching, "Matching genes to organism #{ organism }, up: #{cross_platform_up.length}, down:  #{cross_platform_down.length}")
     
-    platforms = MARQ::Platform.organism_platforms(organism).
-      select  {|platform| MARQ::Platform.has_cross_platform? platform }.
-      collect {|platform| MARQ::Name.cross_platform platform }
+    i = 0
+    platforms = MARQ::Platform.organism_platforms(organism).length
+    Progress.announce(Proc.new{|p| step(:processing,  "Generating Scores for platform #{ p } #{ i += 1 }/#{platforms}.")}, :stack_depth => 1)
+    scores = MARQ::RankQuery.organism_scores(organism, cross_platform_up, cross_platform_down)
+    scores = MARQ::RankQuery.add_pvalues(scores, cross_platform_up.length, cross_platform_down.length)
 
-
-    scores = {}
-    platforms.each_with_index{|platform, i|
-      step(:processing, "Generating Scores for platform #{ platform } #{ i + 1 }/#{platforms.length}.")
-      scores = scores.merge(MARQ::RankQuery.platform_scores(platform, cross_platform_up, cross_platform_down))
-    }
     step(:saving, "Saving results")
     write("scores/#{job_name}.yaml.gz", gzip(ZAML.dump(scores)))
   end

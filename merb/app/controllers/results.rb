@@ -72,21 +72,20 @@ class Results < Application
     experiment = params[:experiment]
 
     results = WS::results(job)
-    entries = results[experiment][:total_entries]
     
-    up = results[experiment][:positions_up].select{|p| p !~ /MISSING|PLATFORM/} if results[experiment][:positions_up]
-    down = results[experiment][:positions_down].select{|p| p !~ /MISSING|PLATFORM/} if results[experiment][:positions_down]
+    up   = results[experiment][:up][:positions].compact  if results[experiment][:up][:positions]
+    down = results[experiment][:down][:positions].compact if results[experiment][:down][:positions]
 
     info = {}
     if up && up.any?
       up_filename = File.join(MARQ.workdir, 'merb', 'tmp', 'images', (experiment + '_up').hash.to_s)
-      Score.draw_hits(up, entries, up_filename, {:size => 1000, :bg_color => :green})
+      Score.draw_hits(up, results[experiment][:up][:total], up_filename, {:size => 1000, :bg_color => :green})
       info[:up] = up_filename.sub(/^.*tmp/,'')
     end
 
     if down && down.any?
       down_filename = File.join(MARQ.workdir, 'merb', 'tmp', 'images', (experiment + '_down').hash.to_s)
-      Score.draw_hits(down, entries, down_filename, {:size => 1000, :bg_color => :green})
+      Score.draw_hits(down,  results[experiment][:down][:total], down_filename, {:size => 1000, :bg_color => :green})
       info[:down] = down_filename.sub(/^.*tmp/,'')
     end
 
@@ -109,7 +108,6 @@ class Results < Application
     up         = params[:side] =~ /up/i
 
     results = WS::results(job)
-    @total = results[experiment][:total_entries]
     
     genes = WS::genes(job)
     
@@ -120,11 +118,13 @@ class Results < Application
     end
     @translations = {}
     if up
-      @hits = genes[:up].zip(results[experiment][:positions_up])
+      @hits = genes[:up].zip(results[experiment][:up][:positions])
+      @total = results[experiment][:up][:total]
       native = genes[:up].collect{|p| p.last}
       native.zip(Info.to_GPL_format(GEO.dataset_platform(gds), native)).each{|p| @translations[p.first] = p.last} if gds
     else
-      @hits = genes[:down].zip(results[experiment][:positions_down]) 
+      @hits = genes[:down].zip(results[experiment][:down][:positions]) 
+      @total = results[experiment][:up][:total]
       native = genes[:down].collect{|p| p.last}
       native.zip(Info.to_GPL_format(GEO.dataset_platform(gds), native)).each{|p| @translations[p.first] = p.last} if gds
     end
@@ -132,7 +132,7 @@ class Results < Application
     org = WS::info(job)[:organism]
     @synonyms = Info::synonyms(org, (genes[:up] + genes[:down]).collect{|p| p[1] }.compact.uniq, WS::info(job)[:platform].nil?)
 
-    @hits = @hits.select{|p| p[1].to_s =~ /\d+/ }.sort{|a,b| 
+    @hits = @hits.reject{|p| p[1].nil?}.sort{|a,b| 
       a[1].to_i <=> b[1].to_i
     }
 

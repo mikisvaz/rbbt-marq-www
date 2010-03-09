@@ -254,7 +254,7 @@ module WS
     marshal_cache(job + '_sort_results') do
 
       results = results(job)
-      FDR.adjust_hash!(results,:pvalue)
+      FDR.adjust_hash!(results, :pvalue)
 
       pos  = [] 
       neg  = []

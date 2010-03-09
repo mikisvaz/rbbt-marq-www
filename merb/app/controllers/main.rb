@@ -14,7 +14,7 @@ class Main < Application
           }
         ]
       }.select{|p| 
-        p[0].to_s != 'worm' &&  # Remove worm, it only has 11 datasets 
+        p[0].to_s != 'Cel' &&  # Remove worm, it only has 11 datasets 
           p[2].any?
       }.each{|p| 
         @organisms[p[0]] = [p[1],p[2]]
