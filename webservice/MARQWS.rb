@@ -12,6 +12,8 @@ class MARQWS < SimpleWS::Jobs
   class ArgumentError < Exception; end
   class NotDone < Exception; end 
 
+  MAX_GENES = 1000
+
   helper :gzip do |string|
     ostream = StringIO.new
     begin
@@ -48,6 +50,8 @@ class MARQWS < SimpleWS::Jobs
 
     info(:up => up, :down => down)
 
+    raise ArgumentError, "This version of MARQ has a #{ MAX_GENES } genes limit for each list" if up.length > MAX_GENES || down.length > MAX_GENES
+
     raise ArgumentError, "No genes identified" if up.empty? && down.empty?
 
     step(:matching, "Matching genes to platform #{ platform }, up: #{up.length}, down:  #{down.length}")
@@ -81,12 +85,15 @@ class MARQWS < SimpleWS::Jobs
     up = up.collect{|gene| gene.strip if gene}
     down = down.collect{|gene| gene.strip if gene}
     
+    raise ArgumentError, "This version of MARQ has a #{ MAX_GENES } genes limit for each list" if up.length > MAX_GENES || down.length > MAX_GENES
+
     info(:up => up, :down => down)
 
     step(:translating, "Translating genes")
 
     cross_platform_up = ID.translate(organism, up)
     cross_platform_down = ID.translate(organism, down)
+
 
     info(
          :cross_platform_up   => cross_platform_up.collect   {|n| n || "NO MATCH"},
@@ -132,7 +139,7 @@ class MARQWS < SimpleWS::Jobs
 
 
   def ts(dataset, comparison, genes)
-    path = MARQ.dataset_path(dataset)
+    path = MARQ::Dataset.path(dataset)
     comparison = comparison.chomp.strip
     if comparison.match(/\[ratio\]/) 
       raise ArgumentError, "Comparison  #{ comparison } does not have a t value"
