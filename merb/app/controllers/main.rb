@@ -9,12 +9,12 @@ class Main < Application
         [  
           org, 
           Organism.name(org), 
-          MARQ.organism_platforms(org).sort{|a,b| 
+          MARQ::Platform.organism_platforms(org).sort{|a,b| 
             a.sub(/GPL/,'').to_i <=> b.sub(/GPL/,'').to_i
           }
         ]
       }.select{|p| 
-        p[0].to_s != 'worm' &&  # Remove worm, it only has 11 datasets 
+        p[0].to_s != 'Cel' &&  # Remove worm, it only has 11 datasets 
           p[2].any?
       }.each{|p| 
         @organisms[p[0]] = [p[1],p[2]]

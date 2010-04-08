@@ -189,7 +189,6 @@ a.toggle, a.ts, a.logratios
 
 #fill
   :margin-top -40px
-  :float left
 
 
 
@@ -201,10 +200,10 @@ a.toggle, a.ts, a.logratios
 !canvas_width= 30px
 !table_font_size= 11px
 
-!results_table_select= 75px
-!results_table_experiment = 620px
+!results_table_select= 80px
+!results_table_experiment = 610px
 !results_table_score= 50px
-!results_table_pvalue= 60px
+!results_table_pvalue= 70px
 !results_table_total= !results_table_select + !results_table_experiment + !results_table_score + !results_table_pvalue
 !results_scroller_size= !results_table_total + !table_scroll_padding
 
@@ -360,6 +359,8 @@ a.toggle, a.ts, a.logratios
     :cursor pointer
     &:hover
       :background-color= !color_highlight
+  td.value
+    :width 70px
 
 #annotations_select
   :font-size 0.8em
@@ -420,7 +421,7 @@ a#close_annotations_menu
 ///* COMPARE SIGNATURES */
 !compare_table_name = 100px
 !compare_table_synonyms= 630px
-!compare_table_pvalue= 70px
+!compare_table_pvalue= 90px
 !compare_table_total= !compare_table_name + !compare_table_synonyms + !compare_table_pvalue
 !compare_scroller_size= !compare_table_total + !table_scroll_padding
 #compare

@@ -27,4 +27,4 @@ merb/public/stylesheets/marq*.css
 merb/public/stylesheets/includes
 install_scripts/CustomDS/sgd
 merb/public/javascripts/marq_all.js
-merb/public/stylesheets/marq.css
+test_signatures/
