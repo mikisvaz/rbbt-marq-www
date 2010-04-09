@@ -6,7 +6,10 @@ rbbt-marq-www=/$PWD/ CD=/$PWD/ filter="*.rb Rakefile *.haml *.txt *.R *.yaml *.r
  }
  merb=merb{
   Rakefile
+  config.ru
   config=config{
+   dependencies.rb
+   environment.rb
    init.rb
    rack.rb
    router.rb
@@ -43,9 +46,11 @@ rbbt-marq-www=/$PWD/ CD=/$PWD/ filter="*.rb Rakefile *.haml *.txt *.R *.yaml *.r
     main.html.haml
    }
    help=help{
+    _menu.html.haml
     index.html.haml
     meth.html.haml
     quick.html.haml
+    webservice.html.haml
    }
    main=main{
     index.html.haml
