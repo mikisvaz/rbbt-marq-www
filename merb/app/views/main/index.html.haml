@@ -49,13 +49,17 @@
         %select#platform{:name => :platform}
           %option#cross{:value =>'cross'} Cross platform query
 
-      #name.parambox
-        %h2.boxtitle Job Name
+      #optional.parambox
+        %h2.boxtitle Job Name and E-mail (Optional)
         %p
-          Select a name for your job. A random one will be assigned if left blank
-        %input{ :name => :name}
+          Select a name for your job. A random one will be assigned if left blank.
+          If an E-mail is specified it will be used to notify the completion of the job.
+        %input#name{ :name => :name}
+        %label{:for => 'name'} Name
+        %br
+        %input#email{ :name => :email}
+        %label{:for => 'email'} E-mail
 
-     
       #submit.parambox
         %input{:type => 'submit'}
 

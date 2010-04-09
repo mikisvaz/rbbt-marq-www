@@ -34,6 +34,7 @@ class Main < Application
     ids_up   = params[:ids_up].split(/["\s,;]+/).uniq.collect{|gene| gene.strip}
     ids_down = params[:ids_down].split(/["\s,;]+/).uniq.collect{|gene| gene.strip}
     name     = params[:name].gsub(/\s/,'_')
+    email    = params[:email] || ""
 
     if platform == "cross"
       name = WS::match_organism(organism, ids_up, ids_down, name || "")
@@ -44,6 +45,7 @@ class Main < Application
 
     ip = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_ADDR']
     JobLog.log(ip, name)
+    MONITOR.add_job(name, email) unless email.empty?
 
 
     redirect "/#{ name }" 

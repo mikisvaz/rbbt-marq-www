@@ -157,8 +157,7 @@ module WS
   end
 
   def self.driver
-    wsdl_url = MARQ.workdir + '/webservice/wsdl/MARQWS.wsdl'
-    SOAP::WSDLDriverFactory.new(wsdl_url).create_rpc_driver
+    SOAP::WSDLDriverFactory.new(WSDL_FILE).create_rpc_driver
   end
 
   def self.logratios(dataset, comparison, genes)
