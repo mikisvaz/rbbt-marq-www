@@ -53,10 +53,12 @@ Merb::BootLoader.before_app_loads do
   require 'MARQ/rankproduct'
 end
  
+tmpdir = File.join(MARQ.workdir, 'merb', 'tmp', 'images')
+FileUtils.mkdir_p(tmpdir) unless File.exist?(tmpdir)
 
 HOST      = ENV['MARQ_HOST'] || `hostname -f`
 WSDL_FILE = MARQ.workdir + '/webservice/wsdl/MARQWS.wsdl'
-MONITOR   = SimpleWS::Jobs::Notifier.new('MARQ', HOST, WSDL_FILE, :smtp_host => ENV['MARQ_SMTP'])
+MONITOR   = SimpleWS::Jobs::Notifier.new('MARQ', HOST, WSDL_FILE, :smtp_host => ENV['MARQ_SMTP'], :filename => File.join(MARQ.workdir, 'merb', 'tmp', 'emails.marshal'))
 
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
@@ -64,9 +66,6 @@ Merb::BootLoader.after_app_loads do
   CacheHelper.reset_locks
 
   MONITOR.start
-
-  tmpdir = File.join(MARQ.workdir, 'merb', 'tmp', 'images')
-  FileUtils.mkdir_p(tmpdir) unless File.exist?(tmpdir)
 
   Merb::Assets::JavascriptAssetBundler.add_callback { |filename| Yui.compress(filename, {:stomp => true, :suffix => ""})} 
   Merb::Assets::StylesheetAssetBundler.add_callback { |filename| Yui.compress(filename, {:stomp => true, :suffix => ""})} 
