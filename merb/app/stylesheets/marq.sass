@@ -120,6 +120,7 @@ body
     :margin-bottom 10px
 
   #genes
+    :clear both
     :width= !main_genes_width
     :display inline-block
     :position relative
@@ -133,6 +134,7 @@ body
     :float right
 
   #submit
+    :clear both
     :text-align center
   #logos, #reference
     :clear both
@@ -194,6 +196,8 @@ a.toggle, a.ts, a.logratios
 #fill
   :margin-top -40px
 
+#name
+  :margin-bottom 10px
 
 
 
@@ -207,7 +211,7 @@ a.toggle, a.ts, a.logratios
 !results_table_select= 80px
 !results_table_experiment = 610px
 !results_table_score= 50px
-!results_table_pvalue= 70px
+!results_table_pvalue= 75px
 !results_table_total= !results_table_select + !results_table_experiment + !results_table_score + !results_table_pvalue
 !results_scroller_size= !results_table_total + !table_scroll_padding
 

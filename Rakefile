@@ -27,6 +27,7 @@ begin
     gem.add_dependency('spreadsheet')
     gem.add_dependency('RedCloth')
     gem.add_dependency('rand')
+    gem.add_dependency('rmail')
     gem.add_dependency('zaml')
 
 

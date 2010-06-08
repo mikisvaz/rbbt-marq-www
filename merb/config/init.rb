@@ -21,6 +21,7 @@ require 'ruby-yui'
 require 'redcloth'      
 require 'rbbt/util/misc'      
 require 'stemmer'
+require 'simplews/notifier'
 
 Merb::Config.use do |c|
   c[:use_mutex] = false
@@ -44,23 +45,27 @@ end
 module RedCloth::Formatters::HTML def br(opts); "\n"; end end
  
 Merb::BootLoader.before_app_loads do
+  # This will get executed after dependencies have been loaded but before your app's classes have loaded.
+
   require 'lib/helper'
   require 'MARQ/main'
   require 'MARQ/annotations'
   require 'MARQ/rankproduct'
-
- 
-  # This will get executed after dependencies have been loaded but before your app's classes have loaded.
 end
  
+tmpdir = File.join(MARQ.workdir, 'merb', 'tmp', 'images')
+FileUtils.mkdir_p(tmpdir) unless File.exist?(tmpdir)
+
+HOST      = ENV['MARQ_HOST'] || `hostname -f`
+WSDL_FILE = MARQ.workdir + '/webservice/wsdl/MARQWS.wsdl'
+MONITOR   = SimpleWS::Jobs::Notifier.new('MARQ', HOST, WSDL_FILE, :smtp_host => ENV['MARQ_SMTP'], :filename => File.join(MARQ.workdir, 'merb', 'tmp', 'emails.marshal'))
+
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
-  #
 
   CacheHelper.reset_locks
 
-  tmpdir = File.join(MARQ.workdir, 'merb', 'tmp', 'images')
-  FileUtils.mkdir_p(tmpdir) unless File.exist?(tmpdir)
+  MONITOR.start
 
   Merb::Assets::JavascriptAssetBundler.add_callback { |filename| Yui.compress(filename, {:stomp => true, :suffix => ""})} 
   Merb::Assets::StylesheetAssetBundler.add_callback { |filename| Yui.compress(filename, {:stomp => true, :suffix => ""})} 
