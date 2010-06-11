@@ -123,6 +123,8 @@ class MARQWS < SimpleWS::Jobs
     path = MARQ::Dataset.path(dataset)
     comparison = comparison.chomp.strip
 
+    raise ArgumentError, "Dataset #{ dataset } not found" if path.nil?
+
     position = File.open(path + '.experiments').collect{|l| l.chomp.strip}.index(comparison)
     raise ArgumentError, "Comparison #{ comparison } not found" if position.nil?
 
