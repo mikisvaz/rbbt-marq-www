@@ -77,13 +77,13 @@ class Results < Application
     down = results[experiment][:down][:positions].compact if results[experiment][:down][:positions]
 
     info = {}
-    if up && up.any?
+    if up 
       up_filename = File.join(MARQ.workdir, 'merb', 'tmp', 'images', (experiment + '_up').hash.to_s)
       Score.draw_hits(up, results[experiment][:up][:total], up_filename, {:size => 1000, :bg_color => :green})
       info[:up] = up_filename.sub(/^.*tmp/,'')
     end
 
-    if down && down.any?
+    if down 
       down_filename = File.join(MARQ.workdir, 'merb', 'tmp', 'images', (experiment + '_down').hash.to_s)
       Score.draw_hits(down,  results[experiment][:down][:total], down_filename, {:size => 1000, :bg_color => :green})
       info[:down] = down_filename.sub(/^.*tmp/,'')
