@@ -264,7 +264,8 @@ function prepare_selects(){
         experiments += encodeURI($(this).attr('name')) + "|";
         invert += encodeURI($(this).attr('name')) + "|";
       })
-      window.open('/compare?job=' + job + '&experiments=' + experiments + '&invert=' + invert)
+      post('/compare', {job: job, experiments: experiments, invert: invert}, true);
+      //window.open('/compare?job=' + job + '&experiments=' + experiments + '&invert=' + invert)
       return false;
     })
 } 
@@ -396,9 +397,21 @@ function start_results_main(){
     });
 
     $('a.selected_genes').click(function(){
-      window.location = '/genes?genes=' + genes.join('|');
+      post('/genes', {genes: genes.join('|')}, false);
       return(false);
     })
+
+    $('a.logratios_hits').click(function(){
+      post('/logratios', {job: job, experiment: experiment, genes: genes.join(',')}, false);
+      return(false);
+    })
+
+    $('a.ts_hits').click(function(){
+      post('/ts', {job: job, experiment: experiment, genes: genes.join(',')}, false);
+      return(false);
+    })
+
+
 
     $(window).unbind('unload')
     $(window).bind('unload',function(){

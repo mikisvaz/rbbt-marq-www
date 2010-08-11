@@ -195,8 +195,8 @@ class Results < Application
 
   def compare
     job = params[:job]
-    signatures = params[:experiments].scan(/[^|]+/)
-    invert = (params[:invert] || "").scan(/[^|]+/)
+    signatures = params[:experiments].scan(/[^|]+/).collect{|sig| CGI::unescape(sig)}
+    invert = (params[:invert] || "").scan(/[^|]+/).collect{|sig| CGI::unescape(sig)}
     format = params[:format]
 
     @url = "/compare?" + request.env['QUERY_STRING']
@@ -219,8 +219,6 @@ class Results < Application
       @genes_up.collect!{|p| p[1]}
       @genes_down.collect!{|p| p[1]}
       @org = WS::info(job)[:organism]
-  
-  
   
       @scores_up, @scores_down = CompareGenes::RankProduct.compare(job, signatures, invert)
   

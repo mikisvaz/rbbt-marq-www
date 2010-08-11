@@ -313,7 +313,7 @@ module CompareGenes
     def self.compare(job, signatures, invert)
       filename = filename(job, signatures, invert)
       marshal_cache("compare", {:job => job, :signatures => signatures, :invert => invert}) do
-        scores_up = Object::RankProduct.rankproduct(signatures, :invert => invert, :cross_platform => WS::cross_platform?(job))
+        scores_up   = Object::RankProduct.rankproduct(signatures, :invert => invert, :cross_platform => WS::cross_platform?(job))
         scores_down = Object::RankProduct.rankproduct(signatures, :invert => signatures - invert, :cross_platform => WS::cross_platform?(job))
 
         FileUtils.rm(filename + '.tsv') if File.exist? filename + '.tsv'

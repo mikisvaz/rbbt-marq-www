@@ -48,4 +48,23 @@ function clear_textareas(){
     })
 }  
 
+function post(URL, PARAMS, NEW_WINDOW) {
+  var temp=document.createElement("form");
+  temp.action=URL;
+  temp.method="POST";
+  temp.style.display="none";
 
+  if (NEW_WINDOW){
+    temp.target = "_blank";
+  }
+
+  for(var x in PARAMS) {
+    var opt=document.createElement("textarea");
+    opt.name=x;
+    opt.value=PARAMS[x];
+    temp.appendChild(opt);
+  }
+  document.body.appendChild(temp);
+  temp.submit();
+  return temp;
+}
