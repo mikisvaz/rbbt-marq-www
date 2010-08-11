@@ -1,5 +1,8 @@
 :javascript
   current = '#{@job}';
+  job     = '#{@job}';
+  experiments = '#{@experiments.join("|")}';
+  invert      = '#{@invert.join("|")}';
 
 
 %h2#title
@@ -109,8 +112,8 @@
                 %td.pvalue= print_pvalue pvalue, 0.00001
 
     .menu_links
-      %a.tab.button{:href => @url + '&format=tsv'} Download in Tab Separated Values  
-      %a.excel.button{:href => @url + '&format=excel'} Download in Excel
+      %a#compare_tab.tab.button{:href => '#'} Download in Tab Separated Values  
+      %a#compare_excel.excel.button{:href => '#'} Download in Excel
       .clear_floats
   
 :javascript
@@ -154,7 +157,18 @@
     });
     
    $("#genes_compare").tabs();
-  
+
+   $('#compare_tab').click(function(){
+    post('/compare', {job: job, experiments: experiments, invert: invert, format: 'tsv'}, false);
+    return false;
+   })
+
+   $('#compare_excel').click(function(){
+     post('/compare', {job: job, experiments: experiments, invert: invert, format: 'excel'}, false);
+     return false;
+   })
+
+ 
   }) 
   
 

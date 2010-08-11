@@ -270,7 +270,7 @@ function prepare_selects(){
     })
 } 
 
-
+     
 
 function start_results_main(){
   load_annotations("Words")
