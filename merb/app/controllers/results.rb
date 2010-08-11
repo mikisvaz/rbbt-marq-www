@@ -192,6 +192,31 @@ class Results < Application
     end
   end
 
+  def ps
+    job = params[:job]
+    experiment = params[:experiment]
+    genes = params[:genes].split(',')
+    
+    dataset, condition = experiment.match(/^(.*?:) (.*)/).values_at(1,2)
+
+    headers["Content-Type"] =  'text/plain'
+    headers["Content-Disposition"] =  'attachment; filename=p-values.txt'
+
+    if genes && genes.any?
+      translations = WS::translations(job)
+      cross = translations.values_at(*genes)
+      inverse = translations.invert
+      WS::ps(dataset.sub(/:$/,'_cross_platform'), condition, cross.compact).sort.collect{|l| 
+        code, value = l.chomp.split(/\t/).values_at(0,1)
+        next if inverse[code].nil?
+        "#{inverse[code]}\t#{value}"
+      }.join("\n")
+    else
+      WS::ps(dataset.sub(/:$/,'_cross_platform'), condition, [])
+    end
+  end
+
+
 
   def compare
     job = params[:job]

@@ -164,6 +164,10 @@ module WS
     driver.logratios(dataset, comparison, genes)
   end
 
+
+  def self.ps(dataset, comparison, genes)
+    driver.ps(dataset, comparison, genes)
+  end
   def self.ts(dataset, comparison, genes)
     driver.ts(dataset, comparison, genes)
   end

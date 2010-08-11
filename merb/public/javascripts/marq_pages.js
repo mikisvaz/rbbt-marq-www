@@ -411,6 +411,12 @@ function start_results_main(){
       return(false);
     })
 
+    $('a.ps_hits').click(function(){
+      post('/ps', {job: job, experiment: experiment, genes: genes.join(',')}, false);
+      return(false);
+    })
+
+
 
 
     $(window).unbind('unload')

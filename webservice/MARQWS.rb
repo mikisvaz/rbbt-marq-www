@@ -131,7 +131,7 @@ class MARQWS < SimpleWS::Jobs
     `paste #{path + '.codes'} #{path + '.logratios'}| grep '#{genes.collect{|gene| "^#{ gene }[[:space:]]"}.join('\|')}'|cut -f1,#{position + 2}`
   end
 
-  desc "Retrieve log-ratios for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+  desc "Retrieve log-ratios for the signature. Genes identifiers are platform probe ids for normal platforms or the internal format
         for cross-platform."
   param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
              :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
@@ -153,13 +153,35 @@ class MARQWS < SimpleWS::Jobs
     `paste #{path + '.codes'} #{path + '.t'}| grep '#{genes.collect{|gene| "^#{ gene }[[:space:]]"}.join('\|')}'|cut -f1,#{position + 2}`
   end
 
-  desc "Retrieve t-values for signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+  desc "Retrieve t-values for the signature. Genes identifiers are platform probe ids for normal platforms or the internal format
         for cross-platform."
   param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
              :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
              :genes   => "Subset of genes to retrieve. If empty retrieves all",
              :return => "Tab separated file, firts column are gene ids, second column are the values"
   serve :ts, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
+
+
+  def ps(dataset, comparison, genes)
+    path = MARQ::Dataset.path(dataset)
+    comparison = comparison.chomp.strip
+    if comparison.match(/\[ratio\]/) 
+      raise ArgumentError, "Comparison  #{ comparison } does not have a t value"
+    end
+
+    position = File.open(path + '.experiments').collect{|l| l.chomp.strip}.select{|name| !name.match(/\[ratio\]/)}.index(comparison)
+    raise ArgumentError, "Comparison #{ comparison } not found" if position.nil?
+
+    `paste #{path + '.codes'} #{path + '.pvalues'}| grep '#{genes.collect{|gene| "^#{ gene }[[:space:]]"}.join('\|')}'|cut -f1,#{position + 2}`
+  end
+
+  desc "Retrieve p-values for the signature. Genes identifiers are platform probe ids for normal platforms or the internal format
+        for cross-platform."
+  param_desc :dataset => "Dataset code (eg. GDS1375 or GDS1375_cross_platform)", 
+             :comparison => "Signature from the dataset (eg. disease: cancer <=> control)",
+             :genes   => "Subset of genes to retrieve. If empty retrieves all",
+             :return => "Tab separated file, firts column are gene ids, second column are the values"
+  serve :ps, %w(dataset comparison genes), {:dataset => :string, :comparison => :string, :genes => :array, :return => :string}
  
  
   # {{{ Annotations
@@ -219,7 +241,7 @@ if __FILE__ == $0
 
   log_dir = File.join(MARQ.workdir, 'webservice', 'log')
   FileUtils.mkdir_p log_dir unless File.exist? log_dir
-  server.logtofile(File.join(log_dir, 'MARQWS.log'))
+  #server.logtofile(File.join(log_dir, 'MARQWS.log'))
 
 
   trap('INT') { server.shutdown }

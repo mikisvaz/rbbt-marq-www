@@ -41,6 +41,7 @@ Merb::Router.prepare do
   match('/images/:image').to(:controller => 'results', :action => 'images')
   match('/logratios').to(:controller => 'results', :action => 'logratios')
   match('/ts').to(:controller => 'results', :action => 'ts')
+  match('/ps').to(:controller => 'results', :action => 'ps')
   match('/compare').to(:controller => 'results', :action => 'compare')
   match('/experiment_hits').to(:controller => 'results', :action => 'explore_hits')
   match('/experiment_info').to(:controller => 'results', :action => 'ajax_experiment')

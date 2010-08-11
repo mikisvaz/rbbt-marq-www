@@ -13,6 +13,7 @@
     %a.logratios{:href => "/logratios?experiment=#{escapeURI(@experiment)}&job=#{@job}&genes="} [Get logratios]
     - if @experiment !~ /\[ratio\]/
       %a.ts{:href => "/ts?experiment=#{escapeURI(@experiment)}&job=#{@job}&genes="} [Get t-values]
+      %a.ps{:href => "/ps?experiment=#{escapeURI(@experiment)}&job=#{@job}&genes="} [Get p-values]
 
 
   - if info[:up]
