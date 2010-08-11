@@ -258,11 +258,11 @@ function prepare_selects(){
       var experiments = ""
       var invert = ""
       $('.compare_select:checked').each(function(){
-        experiments += encodeURI($(this).attr('name')) + "|";
+        experiments += $(this).attr('name') + "|";
       })
       $('.compare_invert:checked').each(function(){
         experiments += encodeURI($(this).attr('name')) + "|";
-        invert += encodeURI($(this).attr('name')) + "|";
+        invert += $(this).attr('name') + "|";
       })
       post('/compare', {job: job, experiments: experiments, invert: invert}, true);
       //window.open('/compare?job=' + job + '&experiments=' + experiments + '&invert=' + invert)

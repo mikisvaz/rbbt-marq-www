@@ -236,8 +236,8 @@ class Results < Application
           @sorted_down = @scores_down.select{|gene, info| info[1] < threshold}.sort{|a,b| a[1][0] <=> b[1][0]}
           @synonyms = Info::synonyms(WS::info(job)[:organism], @scores_up.keys, true)
           @translations = WS::translations(job).invert
-          @experiments = signatures
-          @invert      = invert
+          @experiments = params[:experiments]
+          @invert      = params[:invert]
           render
         end
       end

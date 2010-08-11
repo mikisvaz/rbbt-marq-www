@@ -22,6 +22,7 @@ require 'redcloth'
 require 'rbbt/util/misc'      
 require 'stemmer'
 require 'simplews/notifier'
+require 'cgi'
 
 Merb::Config.use do |c|
   c[:use_mutex] = false
