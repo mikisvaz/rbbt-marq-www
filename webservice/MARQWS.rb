@@ -12,7 +12,7 @@ class MARQWS < SimpleWS::Jobs
   class ArgumentError < Exception; end
   class NotDone < Exception; end 
 
-  MAX_GENES = 1000
+  MAX_GENES = 2000
 
   helper :gzip do |string|
     ostream = StringIO.new
@@ -216,6 +216,11 @@ if __FILE__ == $0
 
   FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice', 'html_doc/') unless File.exist? File.join(MARQ.workdir, '/webservice', 'html_doc/')
   server.documentation(File.join(MARQ.workdir, '/webservice', 'html_doc', 'documentation.html'))
+
+  log_dir = File.join(MARQ.workdir, 'webservice', 'log')
+  FileUtils.mkdir_p log_dir unless File.exist? log_dir
+  server.logtofile(File.join(log_dir, 'MARQWS.log'))
+
 
   trap('INT') { server.shutdown }
   server.start

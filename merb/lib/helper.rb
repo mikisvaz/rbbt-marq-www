@@ -181,7 +181,7 @@ module WS
     begin
       YAML::load(driver.info(job))
     rescue Exception
-      exit(-1) if $!.message =~ /Connection refused/
+      raise "Connection with web server failed. It might be down." if $!.message =~ /Connection refused/
       raise JobNotFound, $!.message
     end
   end

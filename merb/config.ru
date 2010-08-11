@@ -47,7 +47,11 @@ def init_WS
 
       FileUtils.mkdir_p File.join(MARQ.workdir, '/webservice/html_doc/') unless File.exist? File.join(MARQ.workdir, '/webservice/html_doc/')
       Open.write(File.join(MARQ.workdir, '/webservice/html_doc/documentation.html'), server.documentation)
-  
+
+      log_dir = File.join(MARQ.workdir, 'webservice', 'log')
+      FileUtils.mkdir_p log_dir unless File.exist? log_dir
+      server.logtofile(File.join(log_dir, 'MARQWS.log'))
+
       trap('INT') { server.shutdown }
       server.start
   end
